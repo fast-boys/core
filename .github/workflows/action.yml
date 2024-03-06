@@ -34,7 +34,7 @@ jobs:
           git checkout core || git checkout -b core
           git pull origin core
           mkdir -p core
-          rsync -av --exclude='.git/' --exclude='.github/' ./ /tmp/S10P22D204/core/ || rsync_exit_code=$? 
+          rsync -av --exclude='.git/' --exclude='.github/' ./ S10P22D204/core/ || rsync_exit_code=$? 
           git add .
           git commit -m "core server develop update"
           git push origin core --force
