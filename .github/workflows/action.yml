@@ -29,13 +29,14 @@ jobs:
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
-          git clone https://oauth2:$GITLAB_TOKEN@lab.ssafy.com/s10-bigdata-recom-sub2/S10P22D204.git
-          cd S10P22D204
-          git checkout core || git checkout -b core
-          git pull origin core
-          mkdir -p core
-          rsync -av --exclude='.git/' --exclude='.github/' ./ core/ || rsync_exit_code=$? 
+          git clone --branch core https://oauth2:$GITLAB_TOKEN@lab.ssafy.com/s10-bigdata-recom-sub2/S10P22D204.git /tmp/gitlab-repo
+          rsync -av --exclude='.git/' --exclude='.github/' ./core/ /tmp/gitlab-repo/core/
+          cd /tmp/gitlab-repo
           git add .
-          git commit -m "core server develop update"
-          git push origin core --force
-
+          git_status=$(git status --porcelain)
+          if [ ! -z "$git_status" ]; then
+            git commit -m "core server develop update"
+            git push origin core --force
+          else
+            echo "No changes to commit."
+          fi
