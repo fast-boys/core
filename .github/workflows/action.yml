@@ -32,7 +32,7 @@ jobs:
           git clone https://oauth2:$GITLAB_TOKEN@lab.ssafy.com/s10-bigdata-recom-sub2/S10P22D204.git
           cd S10P22D204
           git checkout core || git checkout -b core
-          git pull origin stream
+          git pull origin core
           rsync -av --delete --exclude='.git/' --exclude='.github' ../ stream/ || rsync_exit_code=$?
           if [ "$rsync_exit_code" -eq 24 ]; then
             echo "rsync reported files vanished warning (code 24), but proceeding."
