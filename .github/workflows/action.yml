@@ -35,7 +35,7 @@ jobs:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
           cd ..
-          git clone --branch core https://oauth2:$GITLAB_TOKEN@lab.ssafy.com/s10-bigdata-recom-sub2/S10P22D204.git /S10P22D204
+          sudo git clone --branch core https://oauth2:$GITLAB_TOKEN@lab.ssafy.com/s10-bigdata-recom-sub2/S10P22D204.git /S10P22D204
           rsync -av --delete --exclude='.git/' --exclude='.github/' ./core/ /tmp/gitlab-repo/core/
           cd /tmp/gitlab-repo
           git add .
