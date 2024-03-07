@@ -41,3 +41,4 @@ jobs:
             git push origin core --force
           else
             echo "No changes to commit."
+          fi
