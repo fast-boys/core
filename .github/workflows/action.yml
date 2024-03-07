@@ -9,6 +9,11 @@ jobs:
   sync-to-gitlab:
     runs-on: ubuntu-latest
     steps:
+      - name: mkdir core
+        uses: |
+          mkdir -p core
+          cd core
+
       - name: Checkout the repository
         uses: actions/checkout@v2
         with:
@@ -29,8 +34,9 @@ jobs:
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
-          git clone --branch core https://oauth2:$GITLAB_TOKEN@lab.ssafy.com/s10-bigdata-recom-sub2/S10P22D204.git /tmp/gitlab-repo
-          rsync -av --exclude='.git/' --exclude='.github/' ./core/ /tmp/gitlab-repo/core/
+          cd ..
+          git clone --branch core https://oauth2:$GITLAB_TOKEN@lab.ssafy.com/s10-bigdata-recom-sub2/S10P22D204.git /S10P22D204
+          rsync -av --delete --exclude='.git/' --exclude='.github/' ./core/ /tmp/gitlab-repo/core/
           cd /tmp/gitlab-repo
           git add .
           git_status=$(git status --porcelain)
