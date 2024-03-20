@@ -5,7 +5,6 @@ WORKDIR /app
 COPY requirements.txt ./
 COPY .idea ./.idea
 COPY app ./app
-COPY google_service_key.json ./
 
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
