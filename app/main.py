@@ -21,7 +21,7 @@ app.add_middleware(
 )
 
 
-@app.post("/echo")
+@app.get("/echo")
 def echo():
     return {"data": "안녕하세요"}
 
