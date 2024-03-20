@@ -76,6 +76,7 @@ jobs:
           script: |
             docker stop core || true
             docker rm core || true
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/core:latest
             docker run --name core -d \
             -p 8000:8000 \
             --network=bridge \
