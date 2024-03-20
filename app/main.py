@@ -7,7 +7,6 @@ from database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
 
 
-
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -28,8 +27,6 @@ app.add_middleware(
 #     https_only=True,
 #     same_site="None",
 # )
-
-
 
 
 """
