@@ -2,3 +2,4 @@ uvicorn[standard]
 fastapi
 sqlalchemy
 httpx
+mysqlclient
