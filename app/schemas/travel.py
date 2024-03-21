@@ -10,3 +10,11 @@ class TravelResponse(BaseModel):
     startDate: datetime.date
     endDate: datetime.date
     numOfCity: int
+
+
+class MySpotResponse(BaseModel):
+    locationId: int
+    locationImage: Optional[str] = None
+    locationName: str
+    locationAddress: str
+    locationMemo: Optional[str] = None
