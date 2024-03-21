@@ -13,7 +13,13 @@ from fastapi.middleware.cors import CORSMiddleware
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-origins = ["https://localhost", "https://localhost:3000", "https://localhost:8000"]
+origins = [
+    "https://localhost",
+    "https://localhost:3000",
+    "https://localhost:8000",
+    "https://j10d204.p.ssafy.io",
+    "http://j10d204.p.ssafy.io",
+]
 
 # CORS 설정
 app.add_middleware(
