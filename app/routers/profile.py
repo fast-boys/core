@@ -1,47 +1,47 @@
-router = APIRouter(tags=["user_profile"])
+import base64
+import os
+from fastapi import APIRouter, Depends, HTTPException, Path, Request, Response
+from fastapi.security import HTTPBearer
+
+from services.utils import get_internal_id
+from database import get_db
+from sqlalchemy.orm import Session
+
+from models.user import User
+
+router = APIRouter(tags=["user_profile"], prefix="/profile")
 
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = "HS256"
-
-http_bearer = HTTPBearer()
-
-
-@router.get("/profile")
+@router.get("/")
 async def read_users_me(
     request: Request,
     response: Response,
+    internal_id: str = Depends(get_internal_id),
     db: Session = Depends(get_db),
 ):
-    user = get_user_by_token(request, db, "service_access")
+    user = db.query(User).filter(User.internal_id == internal_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="Not found User")
-    # 사용자 정보를 직접 반환하거나  객체를 사용해서 반환
-    if user.user_type == UserType.Standard:
-        encoded_image = None
-        file_location = user.profile_picture_url
-        if file_location is not None:
-            with open(file_location, "rb") as image_file:
-                encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
-        user_data = {
-            "email": user.email,
-            "name": user.name,
-            "profile_picture_url": encoded_image,
-            "user_type": user.user_type,
-            "auth_provider": user.auth_provider,
-        }
-        return user_data
 
-    elif user.user_type == UserType.Business:
-        business_user = db.query(BusinessUser).filter(BusinessUser.id == user.id).first()
-        print(business_user)
-        user_data = {
-            "email": user.email,
-            "name": user.name,
-            "user_type": user.user_type,
-            "auth_provider": user.auth_provider,
-            "company_info": business_user.company_info,
-            "company_email": business_user.company_email,
-            "company_address": business_user.company_address,
-        }
-        return user_data
+    user_data = {
+        "nickname": user.nickname,
+    }
+    return user_data
+
+
+@router.get("/{nickname}/duplicate")
+async def check_nickname_duplicate(
+    nickname: str = Path(..., description="The nickname to check for existence"),
+    db: Session = Depends(get_db),
+):
+    """
+    닉네임 중복 체크
+
+    ### Args:
+    - nickname (str): 검사하기 위한 닉네임 (입력값)
+
+    ### Returns:
+    - {"duplicate": True/False}
+    """
+    user = db.query(User).filter(User.nickname == nickname).first()
+    return {"duplicate": True if user else False}

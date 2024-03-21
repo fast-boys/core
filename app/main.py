@@ -1,6 +1,9 @@
 from multiprocessing import Process
+
+from fastapi.responses import JSONResponse
+from routers import profile, place
 import sys
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 import uvicorn
 
 from database import engine, Base
@@ -10,8 +13,9 @@ from fastapi.middleware.cors import CORSMiddleware
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-origins = ["https://localhost", "https://localhost:3000", "추가하십시오."]
+origins = ["https://localhost", "https://localhost:3000", "https://localhost:8000"]
 
+# CORS 설정
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -21,25 +25,48 @@ app.add_middleware(
 )
 
 
+# Gateway로부터 들어오는지 확인하는 로직
+@app.middleware("http")
+async def check_header_middleware(request: Request, call_next):
+    # 예외 경로 처리 -> swagger, openapi.json
+    # path_whitelist = ["/docs", "/openapi.json"]
+    # if request.url.path in path_whitelist:
+    #     return await call_next(request)
+
+    # secret_key 헤더가 없거나 틀리면 401 반환
+    # secret_key = request.headers.get("SECRET_KEY_HEADER")
+    # if secret_key != "fastand6":
+    #     return JSONResponse(status_code=401, content={"detail": "Unauthorized"})
+    response = await call_next(request)
+    return response
+
+
+# 테스트용
 @app.get("/echo")
 def echo():
     return {"data": "안녕하세요"}
 
 
-# app.add_middleware(
-#     SessionMiddleware,
-#     secret_key=os.getenv("SESSION_SECRET_KEY"),
-#     https_only=True,
-#     same_site="None",
-# )
-
-
+# session middleware (client side session)
 """
-# 서비스시에 없애야 할 듯. 자동 마이그레이션.
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.getenv("SESSION_SECRET_KEY"),
+    https_only=True,
+    same_site="None",
+)
+"""
+
+
+app.include_router(profile.router)
+app.include_router(place.router)
+
+# app 실행 시 마이그레이션 자동 실행 코드
+"""
 @app.on_event("startup")
 async def startup_event():
     # Alembic 설정 객체 생성
-    alembic_cfg = Config("alembic.ini")  # 'alembic.ini' 파일의 경로를 정확히 지정하세요.
+    alembic_cfg = Config("alembic.ini")  # 'alembic.ini' 파일의 경로를 정확히 지정
     # 마이그레이션 업그레이드 명령 실행
     command.upgrade(alembic_cfg, "head")
 """
@@ -52,8 +79,8 @@ def local_run():
         port=8000,
         log_level="debug",
         reload=True,
-        ssl_keyfile="../../localhost-key.pem",
-        ssl_certfile="../../localhost.pem",
+        # ssl_keyfile="../../localhost-key.pem",
+        # ssl_certfile="../../localhost.pem",
         forwarded_allow_ips="*",  # 모든 프록시된 IP 주소 허용
         proxy_headers=True,  # X-Forwarded-Proto 헤더를 신뢰
     )

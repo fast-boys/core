@@ -1,4 +1,5 @@
 # database.py
+from pymongo import MongoClient
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -23,6 +24,22 @@ Base = declarative_base()
 # 세션 팩토리를 생성합니다
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# MongoDB 데이터베이스 URL
+MONGODB_URL = os.getenv("MONGODB_URL")
+
+# MongoDB 클라이언트 생성
+mongo_client = MongoClient(MONGODB_URL, serverSelectionTimeoutMS=5000)  # 5초 타임아웃
+"""
+mongo_client = MongoClient(
+    "mongodb://localhost:27017/",
+    maxPoolSize=50,
+    connectTimeoutMS=30000,
+    serverSelectionTimeoutMS=30000,
+)
+"""
+m_db = mongo_client["S10P22D204"]
+m_collection = m_db["tripdata"]
+
 
 def get_db():
     db = SessionLocal()
@@ -30,3 +47,10 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def get_m_db():
+    try:
+        yield m_collection
+    finally:
+        pass
