@@ -17,34 +17,22 @@ class User(Base):
     survey_status = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    is_deleted = Column(DateTime(timezone=True), nullable=True)
+    is_deleted = Column(Boolean, default=False)
     vector = Column(LargeBinary, nullable=True)
 
     plans = relationship("Plan", back_populates="user")
-    user_plan = relationship("UserPlan", back_populates="user")
+    user_plans = relationship("UserPlan", back_populates="user")
     my_spots = relationship("MySpot", back_populates="user")
     urls = relationship("Url", back_populates="user")
 
 
-# class MySpot(Base):
-#     __tablename__ = "my_spots"
+class Url(Base):
+    __tablename__ = "urls"
 
-#     id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
-#     spot_id = Column(BigInteger, ForeignKey("spots.id"), nullable=False)
-#     memo = Column(String(255), nullable=True)
-#     created_date = Column(String(255), nullable=True)
+    id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
+    url = Column(String(255), nullable=True)
+    title = Column(String(255), nullable=True)
+    memo = Column(String(255), nullable=True)
+    created_at = Column(String(255), nullable=True)
 
-#     user = relationship("User", back_populates="my_spots")
-#     spot = relationship("Spot", back_populates="my_spots")
-
-
-# class Url(Base):
-#     __tablename__ = "urls"
-
-#     id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
-#     url = Column(String(255), nullable=True)
-#     title = Column(String(255), nullable=True)
-#     memo = Column(String(255), nullable=True)
-#     created_at = Column(String(255), nullable=True)
-
-#     user = relationship("User", back_populates="urls")
+    user = relationship("User", back_populates="urls")

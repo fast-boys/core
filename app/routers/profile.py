@@ -44,4 +44,4 @@ async def check_nickname_duplicate(
     - {"duplicate": True/False}
     """
     user = db.query(User).filter(User.nickname == nickname).first()
-    return {"duplicate": True if user else False}
+    return {"data": "duplicate" if user else "valid"}
