@@ -1,11 +1,12 @@
 import datetime
+from typing import Optional
 from pydantic import BaseModel
 
 
 class TravelResponse(BaseModel):
-    travelId: str
-    travelImage: str
+    travelId: int
+    travelImage: Optional[str] = None
     travelName: str
-    startDate: datetime.datetime
-    endDate: datetime.datetime
+    startDate: datetime.date
+    endDate: datetime.date
     numOfCity: int

@@ -21,7 +21,7 @@ async def get_trip_list(
     db: Session = Depends(get_db),
 ):
     user = db.query(User).filter(User.internal_id == internal_id).first()
-    reponse = []
+    response = []
     if user:
         # User에 연결된 Plan 목록에 접근합니다.
         plans = user.plans
@@ -35,7 +35,7 @@ async def get_trip_list(
                 endDate=plan.end_date,
                 numOfCity=len(plan.plan_citys),
             )
-            reponse.add(res)
-        return JSONResponse(reponse)
+            response.append(res)
+        return response
 
     raise HTTPException(status_code=401, detail="Unauthorized user")
