@@ -1,11 +1,8 @@
 from multiprocessing import Process
 
 from fastapi.responses import JSONResponse
-<<<<<<< HEAD
 from routers import profile, place, recommend
-=======
 from routers import profile, place, travel
->>>>>>> deploy
 import sys
 from fastapi import FastAPI, Request
 import uvicorn
@@ -70,11 +67,8 @@ app.add_middleware(
 
 app.include_router(profile.router)
 app.include_router(place.router)
-<<<<<<< HEAD
 app.include_router(recommend.router)
-=======
 app.include_router(travel.router)
->>>>>>> deploy
 
 # app 실행 시 마이그레이션 자동 실행 코드
 """
