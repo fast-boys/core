@@ -1,11 +1,15 @@
 from multiprocessing import Process
 
 from fastapi.responses import JSONResponse
+<<<<<<< HEAD
 from routers import profile, place, recommend
+=======
+from routers import profile, place, travel
+>>>>>>> deploy
 import sys
 from fastapi import FastAPI, Request
 import uvicorn
-
+from models import user, plan, user_plan, plan_city, visit_place, spot, city, article, my_spot
 from database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -13,8 +17,13 @@ from fastapi.middleware.cors import CORSMiddleware
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-origins = ["https://localhost", "https://localhost:3000", "https://localhost:8000",
-           "http://localhost:5173", "https://j10d204.p.ssafy.io"]
+origins = [
+    "https://localhost",
+    "https://localhost:3000",
+    "https://localhost:8000",
+    "https://j10d204.p.ssafy.io",
+    "http://j10d204.p.ssafy.io",
+]
 
 # CORS 설정
 app.add_middleware(
@@ -61,7 +70,11 @@ app.add_middleware(
 
 app.include_router(profile.router)
 app.include_router(place.router)
+<<<<<<< HEAD
 app.include_router(recommend.router)
+=======
+app.include_router(travel.router)
+>>>>>>> deploy
 
 # app 실행 시 마이그레이션 자동 실행 코드
 """

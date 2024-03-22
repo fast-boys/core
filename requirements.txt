@@ -4,3 +4,5 @@ sqlalchemy
 httpx
 mysqlclient
 pymongo
+google-cloud-storage
+python-multipart
