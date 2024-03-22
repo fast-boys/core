@@ -1,10 +1,11 @@
 from multiprocessing import Process
 
 from fastapi.responses import JSONResponse
+from services.profile import get_internal_id
 from routers import profile, place, recommend
 from routers import profile, place, travel
 import sys
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 import uvicorn
 from models import user, plan, user_plan, plan_city, visit_place, spot, city, article, my_spot
 from database import engine, Base
@@ -50,8 +51,10 @@ async def check_header_middleware(request: Request, call_next):
 
 # 테스트용
 @app.get("/echo")
-def echo():
-    return {"data": "안녕하세요"}
+def echo(
+    internal_id: str = Depends(get_internal_id),
+):
+    return {"data": "안녕하세요", "internal_id": internal_id}
 
 
 # session middleware (client side session)
