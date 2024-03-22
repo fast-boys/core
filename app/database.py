@@ -1,5 +1,6 @@
 # database.py
 from pymongo import MongoClient
+from elasticsearch import Elasticsearch
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -40,6 +41,10 @@ mongo_client = MongoClient(
 m_db = mongo_client["S10P22D204"]
 m_collection = m_db["tripdata"]
 
+ES_URL = os.getenv("ES_URL")
+ES_CERT_FINGERPRINT = os.getenv("ES_CERT_FINGERPRINT")
+ES_PASSWORD = os.getenv("ES_PASSWORD")
+
 
 def get_db():
     db = SessionLocal()
@@ -54,3 +59,20 @@ def get_m_db():
         yield m_collection
     finally:
         pass
+
+
+def init_es_client():
+    return Elasticsearch(
+        hosts=[ES_URL],
+        ssl_assert_fingerprint=ES_CERT_FINGERPRINT,
+        basic_auth=("elastic", ES_PASSWORD),
+        request_timeout=30
+    )
+
+
+def get_es_client():
+    es_client = init_es_client()
+    try:
+        yield es_client
+    finally:
+        es_client.close()

@@ -1,7 +1,7 @@
 from multiprocessing import Process
 
 from fastapi.responses import JSONResponse
-from routers import profile, place
+from routers import profile, place, recommend
 import sys
 from fastapi import FastAPI, Request
 import uvicorn
@@ -13,7 +13,8 @@ from fastapi.middleware.cors import CORSMiddleware
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-origins = ["https://localhost", "https://localhost:3000", "https://localhost:8000"]
+origins = ["https://localhost", "https://localhost:3000", "https://localhost:8000",
+           "http://localhost:5173", "https://j10d204.p.ssafy.io"]
 
 # CORS 설정
 app.add_middleware(
@@ -60,6 +61,7 @@ app.add_middleware(
 
 app.include_router(profile.router)
 app.include_router(place.router)
+app.include_router(recommend.router)
 
 # app 실행 시 마이그레이션 자동 실행 코드
 """
