@@ -2,8 +2,7 @@ from multiprocessing import Process
 
 from fastapi.responses import JSONResponse
 from services.profile import get_internal_id
-from routers import profile, place, recommend
-from routers import profile, place, travel
+from routers import profile, place, travel, recommend, vector
 import sys
 from fastapi import Depends, FastAPI, Request
 import uvicorn
@@ -72,6 +71,7 @@ app.include_router(profile.router)
 app.include_router(place.router)
 app.include_router(recommend.router)
 app.include_router(travel.router)
+app.include_router(vector.router)
 
 # app 실행 시 마이그레이션 자동 실행 코드
 """
