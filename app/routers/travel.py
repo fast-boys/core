@@ -8,7 +8,7 @@ from models.user import User
 from database import get_db
 from sqlalchemy.orm import Session
 
-from services.utils import get_internal_id
+from services.profile import get_internal_id
 
 router = APIRouter(tags=["trip"], prefix="/travel")
 
