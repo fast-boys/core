@@ -1,7 +1,9 @@
 import base64
+import uuid
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Path, Request, Response, UploadFile
 
-from services.profile import download_from_gcs, upload_to_gcs
+from services.gcs import download_from_gcs, generate_signed_url, upload_to_gcs
+from services.profile import get_profile_image_signed_url
 from services.utils import get_internal_id
 from database import get_db
 from sqlalchemy.orm import Session
@@ -19,11 +21,11 @@ async def read_users_me(
     user = db.query(User).filter(User.internal_id == internal_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="Not found User")
-    download_from_gcs
+    signed_url = get_profile_image_signed_url(user.profile_image)
 
     user_data = {
         "username": user.nickname,
-        "profileImage": user.profile_picture_url,
+        "profileImage": signed_url,
     }
     return user_data
 
@@ -55,30 +57,24 @@ async def update_user_profile(
     db: Session = Depends(get_db),
 ):
     user = db.query(User).filter(User.internal_id == internal_id).first()
-    print("??")
+
     if not user:
         raise HTTPException(status_code=401, detail="Unauthorized user")
-    print(profile_img.filename)
-    content = profile_img.file.read()
+
+    check_duplicate = db.query(User).filter(User.nickname == name).first()
+
+    if not check_duplicate:
+        user.nickname = name
+
+    if user == check_duplicate:
+        check_duplicate = None
+
     if profile_img and profile_img.filename:
-        """파일 저장 또는 처리
-        file_location = f"C:/files/{profile_img.filename}"
-        with open(file_location, "wb+") as file_object:
-            file_object.write(profile_img.file.read())
-        """
-        file_path = f"profiles/{user.internal_id}"
+        img_uuid = str(uuid.uuid4())
+        file_path = f"profiles/{img_uuid}"
+        user.profile_image = file_path
         background_tasks.add_task(upload_to_gcs, profile_img, file_path)
-        upload_to_gcs(profile_img, file_path, user.internal_id)
-        file_name = profile_img.filename.split(".")[-1]
-        user.profile_image = f"/app/storage/{user.internal_id}.{profile_img.filename.split('.')[-1]}"
 
-    user.name = name
-    # user.profile_image = f"C:/files/{user.internal_id}.{profile_img.filename.split('.')[-1]}"
     db.commit()
-    file_base64 = base64.b64encode(content).decode("utf-8")
 
-    user_data = {
-        "name": name,
-        "profile_image": file_base64,
-    }
-    return user_data
+    return {"data": "duplicate" if check_duplicate else "valid"}
