@@ -12,7 +12,9 @@ class Spot(Base):
     long = Column(String(255), nullable=False)
     description = Column(String(255), nullable=False)
     address = Column(String(255), nullable=False)
-    category = Column(String(255), nullable=True)  # Assuming it's stored as a JSON string or similar.
+    category = Column(
+        String(255), nullable=True
+    )  # Assuming it's stored as a JSON string or similar.
 
     visit_places = relationship("VisitPlace", back_populates="spot")
     my_spots = relationship("MySpot", back_populates="spot")

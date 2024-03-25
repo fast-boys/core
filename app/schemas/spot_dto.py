@@ -6,9 +6,10 @@ class SpotBaseDto(BaseModel):
     """
     모든 관광지 DTO에서 공통적으로 사용되는 기본 필드
     """
-    spot_id: str    # 관광지 고유 식별자
-    name: str       # 관광지 이름
-    address: str    # 관광지 주소
+
+    spot_id: str  # 관광지 고유 식별자
+    name: str  # 관광지 이름
+    address: str  # 관광지 주소
     image_url: str  # 관광지 대표 이미지 URL
 
 
@@ -31,8 +32,9 @@ class DetailSpotDto(SpotBaseDto):
     관광지 상세 정보 페이지에 사용되는 DTO
     선택적으로 제공되는 필드 ( ex. parking 등 ) 이 있으며, Optional 객체로 관리됨
     """
+
     image_urls: List[str]  # 관광지 대표 이미지 URL 목록
-    description: str     # 관광지 설명
+    description: str  # 관광지 설명
     lat: str  # 위도
     long: str  # 경도
 

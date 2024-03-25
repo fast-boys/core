@@ -8,8 +8,7 @@ from schemas.spot_dto import DetailSpotDto
 router = APIRouter(tags=["place"], prefix="/place")
 
 
-@router.get(path="/{spot_id}",
-            response_model=DetailSpotDto)
+@router.get(path="/{spot_id}", response_model=DetailSpotDto)
 async def get_details(spot_id: str, collection: Any = Depends(get_m_db)):
     """
     spot_id 를 지닌 관광지에 대한 Detail 정보를 반환합니다.
@@ -19,8 +18,10 @@ async def get_details(spot_id: str, collection: Any = Depends(get_m_db)):
     - :return **DetailSpotDto**: 관광지 상세정보 반환
     """
     spot = collection.find_one({"spot_id": {"$eq": spot_id}})
-    if spot is None:    # 해당 spot_id를 가진 문서를 찾을 수 없음
-        raise HTTPException(status_code=404, detail=f"Spot ID {spot_id}에 해당하는 관광지를 찾을 수 없습니다.")
+    if spot is None:  # 해당 spot_id를 가진 문서를 찾을 수 없음
+        raise HTTPException(
+            status_code=404, detail=f"Spot ID {spot_id}에 해당하는 관광지를 찾을 수 없습니다."
+        )
 
     properties = spot.get("properties", {})
 
@@ -33,7 +34,6 @@ async def get_details(spot_id: str, collection: Any = Depends(get_m_db)):
         image_urls=spot.get("depiction") if spot.get("depiction") else [],
         lat=spot.get("lat", ""),
         long=spot.get("long", ""),
-
         # 상세 정보 고유 데이터
         description=spot.get("description", ""),
         tel=properties.get("tel"),
@@ -65,7 +65,7 @@ async def get_details(spot_id: str, collection: Any = Depends(get_m_db)):
         age_available=properties.get("ageAvailable"),
         seasons=properties.get("seasons"),
         time_required=properties.get("timeRequired"),
-        program=properties.get("program")
+        program=properties.get("program"),
     )
 
     return tour_spot

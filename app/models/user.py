@@ -1,5 +1,14 @@
 from database import Base
-from sqlalchemy import Column, BigInteger, String, Boolean, DateTime, LargeBinary, func, ForeignKey
+from sqlalchemy import (
+    Column,
+    BigInteger,
+    String,
+    Boolean,
+    DateTime,
+    LargeBinary,
+    func,
+    ForeignKey,
+)
 from sqlalchemy.orm import relationship
 import uuid
 
