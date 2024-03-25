@@ -45,12 +45,6 @@ app.add_middleware(
 )
 
 
-app.include_router(profile.router)
-app.include_router(place.router)
-app.include_router(recommend.router)
-app.include_router(travel.router)
-
-
 # Gateway로부터 들어오는지 확인하는 로직
 @app.middleware("http")
 async def check_header_middleware(request: Request, call_next):
