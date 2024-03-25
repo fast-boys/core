@@ -61,7 +61,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/core
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/core,
             ${{ secrets.DOCKERHUB_USERNAME }}/core:v${{ github.run_number }}
           build-args: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
