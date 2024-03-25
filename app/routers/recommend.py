@@ -1,33 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Any, List
 import os
+from dotenv import load_dotenv
 
 from schemas.spot_dto import SimpleSpotDto
+from services.recommend import extract_similar_spots
 from services.utils import get_internal_id
 from database import get_es_client, get_m_db
 
 router = APIRouter(tags=["recommendation"], prefix="/recommendation")
 
+load_dotenv()
 index_name = os.getenv("INDEX_NAME")
-
-
-# response 후처리 후 List[dto] 변환
-def extract_similar_spots(knn_response, collection):
-    similar_spots = []
-
-    for hit in knn_response["hits"]["hits"][1:]:
-        spot_id = hit["_source"]["spot_id"]
-        spot = collection.find_one({"spot_id": {"$eq": spot_id}})
-        if spot:  # MongoDB에서 해당 spot_id를 가진 문서가 있는지 확인
-            spot_dto = SimpleSpotDto(
-                spot_id=spot_id,
-                name=spot.get("name", None),
-                address=spot.get("properties", {}).get("address", ""),
-                image_url=spot.get("depiction")[0] if spot.get("depiction") else "",
-            )
-            similar_spots.append(spot_dto)
-
-    return similar_spots
 
 
 @router.get(path="/{spot_id}/global", response_model=List[SimpleSpotDto])
@@ -103,7 +87,7 @@ async def get_similar_by_spot_id_in_local(spot_id: str,
             index=index_name,
             body={
                 "query": {"match": {"spot_id": spot_id}},
-                "_source": ["text_vector", "location", "address"]
+                "_source": ["text_vector", "address"]
             }
         )
         if not response['hits']['hits']:  # 검색 결과가 비어 있는 경우
