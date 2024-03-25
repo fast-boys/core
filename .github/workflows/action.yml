@@ -64,13 +64,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/core,
             ${{ secrets.DOCKERHUB_USERNAME }}/core:v${{ github.run_number }}
           build-args: |
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
-            MONGODB_URL=${{ secrets.MONGODB_URL }}
-            GCP_SERVICE_ACCOUNT_JSON=${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
-            ES_URL=${{ secrets.ES_URL }}
-            ES_PASSWORD=${{ secrets.ES_PASSWORD }}
-            ES_CERT_FINGERPRINT=${{ secrets.ES_CERT_FINGERPRINT }}
-            ES_IDX_NAME=${{ secrets.ES_IDX_NAME }}
+            VAULT_TOKEN=${{ secrets.VAULT_TOKEN }}
 
   deploy:
     needs: build-and-push

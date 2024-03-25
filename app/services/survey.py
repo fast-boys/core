@@ -1,12 +1,10 @@
-import os
-from dotenv import load_dotenv
 from typing import List
-
 import numpy as np
 from elasticsearch import Elasticsearch
 
-load_dotenv()
-index_name = os.getenv("ES_IDX_NAME")
+from vault_client import get_env_value
+
+index_name = get_env_value("ES_IDX_NAME")
 
 
 # spot_id를 통해 개별 관광지의 vector를 조회

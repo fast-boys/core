@@ -2,18 +2,17 @@ import asyncio
 import datetime
 import json
 import shutil
-from dotenv import load_dotenv
 from fastapi import UploadFile
 from fastapi.responses import StreamingResponse
 from google.cloud import storage
 import os
 from google.oauth2 import service_account
 
-# .env 파일에서 환경 변수 로드
-load_dotenv()
+from vault_client import get_env_value
+
 
 # .env 파일에서 서비스 계정 JSON을 가져옴
-service_account_info = json.loads(os.getenv("GCP_SERVICE_ACCOUNT_JSON"))
+service_account_info = json.loads(get_env_value("GCP_SERVICE_ACCOUNT_JSON"))
 # 서비스 계정 정보를 사용하여 인증 정보 생성
 credentials = service_account.Credentials.from_service_account_info(
     service_account_info

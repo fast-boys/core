@@ -1,4 +1,3 @@
-import base64
 import uuid
 from fastapi import (
     APIRouter,
@@ -13,8 +12,10 @@ from fastapi import (
     UploadFile,
 )
 
-from services.gcs import download_from_gcs, generate_signed_url, upload_to_gcs
-from services.profile import get_internal_id, get_profile_image_signed_url
+from schemas.profile import UserInfoResponse
+from services.gcs import upload_to_gcs
+from services.profile import get_profile_image_signed_url
+from services.profile import get_internal_id
 from database import get_db
 from sqlalchemy.orm import Session
 
@@ -33,10 +34,10 @@ async def read_users_me(
         raise HTTPException(status_code=404, detail="Not found User")
     signed_url = get_profile_image_signed_url(user.profile_image)
 
-    user_data = {
-        "username": user.nickname,
-        "profileImage": signed_url,
-    }
+    user_data = UserInfoResponse(
+        username=user.nickname,
+        profileImage=signed_url,
+    )
     return user_data
 
 

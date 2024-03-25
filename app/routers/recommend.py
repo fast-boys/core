@@ -1,22 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Any, List
-import os
-from dotenv import load_dotenv
 
+from vault_client import get_env_value
 from schemas.spot_dto import SimpleSpotDto
 from services.recommend import extract_similar_spots
-from services.utils import get_internal_id
+from services.profile import get_internal_id
 from database import get_es_client, get_m_db
 
 router = APIRouter(tags=["recommendation"], prefix="/recommendation")
 
-load_dotenv()
-index_name = os.getenv("INDEX_NAME")
+index_name = get_env_value("ES_IDX_NAME")
 
 
 @router.get(path="/{spot_id}/global", response_model=List[SimpleSpotDto])
 async def get_similar_by_spot_id_in_global(
-    spot_id: str, es: Any = Depends(get_es_client), collection: Any = Depends(get_m_db)
+    spot_id: str,
+    es: Any = Depends(get_es_client),
+    collection: Any = Depends(get_m_db),
 ):
     """
     관광지의 Id를 받아 유사한 관광지를 10개 반환합니다.
@@ -67,7 +67,9 @@ async def get_similar_by_spot_id_in_global(
 
 @router.get(path="/{spot_id}/local", response_model=List[SimpleSpotDto])
 async def get_similar_by_spot_id_in_local(
-    spot_id: str, es: Any = Depends(get_es_client), collection: Any = Depends(get_m_db)
+    spot_id: str,
+    es: Any = Depends(get_es_client),
+    collection: Any = Depends(get_m_db),
 ):
     """
     관광지의 Id를 받아 유사한 관광지를 10개 반환합니다.
