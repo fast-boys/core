@@ -8,7 +8,6 @@ from sqlalchemy import (
     LargeBinary,
     func,
     ForeignKey,
-    UUID,
 )
 from sqlalchemy.orm import relationship
 import uuid

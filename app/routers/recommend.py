@@ -1,76 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Any, List
-import os
-from dotenv import load_dotenv
-import numpy as np
 
+from vault_client import get_env_value
 from schemas.spot_dto import SimpleSpotDto
 from services.recommend import extract_similar_spots
 from services.profile import get_internal_id
-from database import get_es_client, get_db, get_m_db
-from models.user import User
+from database import get_es_client, get_m_db
 
 router = APIRouter(tags=["recommendation"], prefix="/recommendation")
 
-load_dotenv()
-index_name = os.getenv("ES_IDX_NAME")
-
-
-@router.get(path="/", response_model=List[SimpleSpotDto])
-async def get_recommendations(
-    internal_id: str = Depends(get_internal_id),
-    db: Any = Depends(get_db),
-    es: Any = Depends(get_es_client),
-    collection: Any = Depends(get_m_db),
-):
-    """
-    해당 유저의 사용자 벡터를 기반으로 추천 관광지를 10개 반환합니다.
-
-    - :return **List[SimpleSpotDto]**: 유사한 관광지 리스트 반환
-    """
-    # User Info 조회
-    user = db.query(User).filter(User.internal_id == internal_id).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail="해당하는 유저를 찾을 수 없습니다.")
-
-    user_vector = user.vector
-    user_vector = np.frombuffer(user_vector, dtype=float)
-    user_vector = np.nan_to_num(user_vector)
-    # print(len(user_vector))   # 768
-
-    # user_vector 기준으로 유사도 검색
-    knn_query = {
-        "knn": {
-            "field": "text_vector",
-            "query_vector": user_vector.tolist(),
-            "k": 11,
-            "num_candidates": 100,
-        },
-        "fields": ["name", "spot_id"],
-        "size": 11,
-    }
-
-    try:
-        knn_response = es.search(index=index_name, body=knn_query)
-        if not knn_response["hits"]["hits"]:  # 검색 결과가 비어 있는 경우
-            raise HTTPException(status_code=404, detail="검색 결과가 없습니다.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-    # 유사한 장소들 추출
-    similar_spots = extract_similar_spots(knn_response, collection)
-
-    # 유사한 관광지가 없는 경우 예외 발생
-    if not similar_spots:
-        raise HTTPException(status_code=404, detail="유사한 관광지를 찾을 수 없습니다.")
-
-    return similar_spots
+index_name = get_env_value("ES_IDX_NAME")
 
 
 @router.get(path="/{spot_id}/global", response_model=List[SimpleSpotDto])
 async def get_similar_by_spot_id_in_global(
-    spot_id: str, es: Any = Depends(get_es_client), collection: Any = Depends(get_m_db)
+    spot_id: str,
+    es: Any = Depends(get_es_client),
+    collection: Any = Depends(get_m_db),
 ):
     """
     관광지의 Id를 받아 유사한 관광지를 10개 반환합니다.
@@ -121,7 +67,9 @@ async def get_similar_by_spot_id_in_global(
 
 @router.get(path="/{spot_id}/local", response_model=List[SimpleSpotDto])
 async def get_similar_by_spot_id_in_local(
-    spot_id: str, es: Any = Depends(get_es_client), collection: Any = Depends(get_m_db)
+    spot_id: str,
+    es: Any = Depends(get_es_client),
+    collection: Any = Depends(get_m_db),
 ):
     """
     관광지의 Id를 받아 유사한 관광지를 10개 반환합니다.

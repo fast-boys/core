@@ -1,7 +1,8 @@
 from multiprocessing import Process
 
 from fastapi.responses import JSONResponse
-from routers import profile, place, recommend, travel, survey
+from vault_client import get_env_value
+from routers import profile, place, recommend, travel
 import sys
 from fastapi import FastAPI, Request
 import uvicorn
@@ -29,6 +30,8 @@ origins = [
     "https://localhost:8000",
     "https://j10d204.p.ssafy.io",
     "http://j10d204.p.ssafy.io",
+    "http://localhost:3000",
+    "http://192.168.100.166",
 ]
 
 # CORS 설정
@@ -78,7 +81,6 @@ app.include_router(profile.router)
 app.include_router(place.router)
 app.include_router(recommend.router)
 app.include_router(travel.router)
-app.include_router(survey.router)
 
 # app 실행 시 마이그레이션 자동 실행 코드
 """

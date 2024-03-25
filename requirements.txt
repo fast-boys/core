@@ -9,4 +9,4 @@ python-multipart
 pydantic~=2.6.4
 python-dotenv~=1.0.1
 elasticsearch~=8.12.1
-numpy~=1.24.4
+hvac
