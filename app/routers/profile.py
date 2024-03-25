@@ -1,11 +1,21 @@
-import base64
 import uuid
-from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Path, Request, Response, UploadFile
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Path,
+    Request,
+    Response,
+    UploadFile,
+)
 
 from schemas.profile import UserInfoResponse
 from services.gcs import upload_to_gcs
 from services.profile import get_profile_image_signed_url
-from services.utils import get_internal_id
+from services.profile import get_internal_id
 from database import get_db
 from sqlalchemy.orm import Session
 

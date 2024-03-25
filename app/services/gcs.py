@@ -2,7 +2,6 @@ import asyncio
 import datetime
 import json
 import shutil
-from dotenv import load_dotenv
 from fastapi import UploadFile
 from fastapi.responses import StreamingResponse
 from google.cloud import storage
@@ -15,7 +14,9 @@ from vault_client import get_env_value
 # .env 파일에서 서비스 계정 JSON을 가져옴
 service_account_info = json.loads(get_env_value("GCP_SERVICE_ACCOUNT_JSON"))
 # 서비스 계정 정보를 사용하여 인증 정보 생성
-credentials = service_account.Credentials.from_service_account_info(service_account_info)
+credentials = service_account.Credentials.from_service_account_info(
+    service_account_info
+)
 # 인증 정보를 사용하여 Storage 클라이언트 생성
 storage_client = storage.Client(credentials=credentials)
 
