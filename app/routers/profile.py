@@ -1,3 +1,4 @@
+from io import BytesIO
 import uuid
 from fastapi import (
     APIRouter,
@@ -13,7 +14,7 @@ from fastapi import (
 )
 
 from schemas.profile import UserInfoResponse
-from services.gcs import upload_to_gcs
+from services.gcs import create_secure_path, process_profile_image, upload_to_gcs, upload_to_open_gcs
 from services.profile import get_profile_image_signed_url
 from services.profile import get_internal_id
 from database import get_db
@@ -32,11 +33,10 @@ async def get_user_profile(
     user = db.query(User).filter(User.internal_id == internal_id).first()
     if not user:
         raise HTTPException(status_code=401, detail="Unauthorized user")
-    signed_url = get_profile_image_signed_url(user.profile_image)
 
     user_data = UserInfoResponse(
         username=user.nickname,
-        profileImage=signed_url,
+        profileImage=user.profile_image,
     )
     return user_data
 
@@ -81,10 +81,17 @@ async def update_user_profile(
         check_duplicate = None
 
     if profile_img and profile_img.filename:
-        img_uuid = str(uuid.uuid4())
-        file_path = f"profiles/{img_uuid}"
-        user.profile_image = file_path
-        background_tasks.add_task(upload_to_gcs, profile_img, file_path)
+        image_data = await profile_img.read()
+        image_stream = BytesIO(image_data)
+        # 이미지 처리
+        processed_image = process_profile_image(image_stream)
+        destination_blob_name = create_secure_path(user.id, "png")
+
+        # 이미지를 GCP에 업로드하고 사인된 URL을 가져옴
+        public_url = upload_to_open_gcs(processed_image, destination_blob_name)
+
+        # userinfo에 공개 URL을 저장
+        user.profile_image = public_url
 
     db.commit()
 

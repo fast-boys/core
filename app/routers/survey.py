@@ -13,9 +13,7 @@ router = APIRouter(tags=["User Survey"], prefix="/survey")
 
 
 @router.get(path="/random_spot", response_model=List[SimpleSpotDto])
-async def get_random_spot(
-    category: int, count: int = 5, collection: Any = Depends(get_m_db)
-):
+async def get_random_spot(category: int, count: int = 5, collection: Any = Depends(get_m_db)):
     """
     특정 카테고리에 해당하는 랜덤 관광지를 반환합니다.
 
@@ -39,9 +37,7 @@ async def get_random_spot(
     """
     # 카테고리 번호 유효성 검사
     if category < 1 or category > 11:
-        raise HTTPException(
-            status_code=400, detail=f"category={category} 가 유효한 값이 아닙니다."
-        )
+        raise HTTPException(status_code=400, detail=f"category={category} 가 유효한 값이 아닙니다.")
 
     pipeline = [
         {
