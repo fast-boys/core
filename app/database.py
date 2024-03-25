@@ -7,8 +7,10 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  # 환경 변수 로드
-DATABASE_URL = os.getenv("DATABASE_URL")
+from vault_client import get_env_value
+
+DATABASE_URL = get_env_value("DATABASE_URL")
+
 
 engine = create_engine(
     DATABASE_URL,
@@ -26,7 +28,7 @@ Base = declarative_base()
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # MongoDB 데이터베이스 URL
-MONGODB_URL = os.getenv("MONGODB_URL")
+MONGODB_URL = get_env_value("MONGODB_URL")
 
 # MongoDB 클라이언트 생성
 mongo_client = MongoClient(MONGODB_URL, serverSelectionTimeoutMS=5000)  # 5초 타임아웃
@@ -41,9 +43,9 @@ mongo_client = MongoClient(
 m_db = mongo_client["S10P22D204"]
 m_collection = m_db["tripdata"]
 
-ES_URL = os.getenv("ES_URL")
-ES_CERT_FINGERPRINT = os.getenv("ES_CERT_FINGERPRINT")
-ES_PASSWORD = os.getenv("ES_PASSWORD")
+ES_URL = get_env_value("ES_URL")
+ES_CERT_FINGERPRINT = get_env_value("ES_CERT_FINGERPRINT")
+ES_PASSWORD = get_env_value("ES_PASSWORD")
 
 
 def get_db():
@@ -66,7 +68,7 @@ def init_es_client():
         hosts=[ES_URL],
         ssl_assert_fingerprint=ES_CERT_FINGERPRINT,
         basic_auth=("elastic", ES_PASSWORD),
-        request_timeout=30
+        request_timeout=30,
     )
 
 

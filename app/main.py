@@ -1,6 +1,7 @@
 from multiprocessing import Process
 
 from fastapi.responses import JSONResponse
+from vault_client import get_env_value
 from services.profile import get_internal_id
 from routers import profile, place, recommend
 from routers import profile, place, travel
@@ -21,6 +22,7 @@ origins = [
     "https://localhost:8000",
     "https://j10d204.p.ssafy.io",
     "http://j10d204.p.ssafy.io",
+    "http://localhost:3000",
 ]
 
 # CORS 설정
