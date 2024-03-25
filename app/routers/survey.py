@@ -2,8 +2,6 @@ from typing import List, Any
 from elasticsearch import Elasticsearch
 from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
-import numpy as np
-import base64
 
 from schemas.spot_dto import SimpleSpotDto
 from services.survey import calculate_user_vector
@@ -12,37 +10,6 @@ from database import get_db, get_m_db, get_es_client
 from models.user import User
 
 router = APIRouter(tags=["User Survey"], prefix="/survey")
-
-
-@router.post(path="/selected")
-async def update_user_vector(
-    spots: List[str] = Body(...),  # 설문시 선택한 관광지의 spot_id 리스트
-    internal_id: str = Depends(get_internal_id),
-    db: Session = Depends(get_db),
-    es_client: Elasticsearch = Depends(get_es_client),
-):
-    """
-    설문조사를 완료하고, 사용자의 초기 벡터를 업데이트합니다.
-
-    - **spots**: 설문조사에서 선택된 관광지 spot_id의 리스트입니다.
-    - **internal_id**: 사용자의 내부 식별자입니다. (DI원칙으로 자동주입)
-    """
-    # User Info 조회
-    user = db.query(User).filter(User.internal_id == internal_id).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail="해당하는 유저를 찾을 수 없습니다.")
-
-    # 초기 유저 벡터 생성
-    user_vector = calculate_user_vector(spots, es_client)
-    # print(len(user_vector))   # 768
-    user_vector = user_vector.tobytes()
-    # user_vector = base64.b64encode(user_vector).decode("utf-8")
-    user.vector = user_vector  # ORM Update
-
-    db.commit()
-
-    return {"message": "설문 반영 완료."}
 
 
 @router.get(path="/random_spot", response_model=List[SimpleSpotDto])
@@ -98,3 +65,34 @@ async def get_random_spot(
         spots.append(spot)
 
     return spots
+
+
+@router.post(path="/selected")
+async def update_user_vector(
+    spots: List[str] = Body(...),  # 설문시 선택한 관광지의 spot_id 리스트
+    internal_id: str = Depends(get_internal_id),
+    db: Session = Depends(get_db),
+    es_client: Elasticsearch = Depends(get_es_client),
+):
+    """
+    설문조사를 완료하고, 사용자의 초기 벡터를 업데이트합니다.
+
+    - **spots**: 설문조사에서 선택된 관광지 spot_id의 리스트입니다.
+    - **internal_id**: 사용자의 내부 식별자입니다. (DI원칙으로 자동주입)
+    """
+    # User Info 조회
+    user = db.query(User).filter(User.internal_id == internal_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="해당하는 유저를 찾을 수 없습니다.")
+
+    # 초기 유저 벡터 생성
+    user_vector = calculate_user_vector(spots, es_client)
+    # print(len(user_vector))   # 768
+    user_vector = user_vector.tobytes()
+    # user_vector = base64.b64encode(user_vector).decode("utf-8")
+    user.vector = user_vector  # ORM Update
+
+    db.commit()
+
+    return {"message": "설문 반영 완료."}
