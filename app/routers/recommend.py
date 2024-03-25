@@ -6,7 +6,7 @@ from vault_client import get_env_value
 from schemas.spot_dto import SimpleSpotDto
 from services.recommend import extract_similar_spots
 from services.profile import get_internal_id
-from database import get_es_client, get_m_db	from database import get_es_client, get_db, get_m_db
+from database import get_es_client, get_db, get_m_db
 from models.user import User
 
 router = APIRouter(tags=["recommendation"], prefix="/recommendation")
