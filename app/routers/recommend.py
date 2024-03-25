@@ -11,7 +11,7 @@ from database import get_es_client, get_m_db
 
 router = APIRouter(tags=["recommendation"], prefix="/recommendation")
 
-index_name = get_env_value("INDEX_NAME")
+index_name = get_env_value("ES_IDX_NAME")
 
 
 @router.get(path="/{spot_id}/global", response_model=List[SimpleSpotDto])

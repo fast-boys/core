@@ -22,6 +22,7 @@ origins = [
     "http://j10d204.p.ssafy.io",
     "http://localhost:3000",
     "http://192.168.100.166",
+    "http://localhost:5173",
 ]
 
 # CORS 설정
@@ -32,6 +33,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.include_router(profile.router)
+app.include_router(place.router)
+app.include_router(recommend.router)
+app.include_router(travel.router)
 
 
 # Gateway로부터 들어오는지 확인하는 로직
@@ -66,11 +73,6 @@ app.add_middleware(
 )
 """
 
-
-app.include_router(profile.router)
-app.include_router(place.router)
-app.include_router(recommend.router)
-app.include_router(travel.router)
 
 # app 실행 시 마이그레이션 자동 실행 코드
 """

@@ -15,13 +15,13 @@ router = APIRouter(tags=["user_profile"], prefix="/profile")
 
 
 @router.get("/")
-async def read_users_me(
+async def get_user_profile(
     internal_id: str = Depends(get_internal_id),
     db: Session = Depends(get_db),
 ):
     user = db.query(User).filter(User.internal_id == internal_id).first()
     if not user:
-        raise HTTPException(status_code=404, detail="Not found User")
+        raise HTTPException(status_code=401, detail="Unauthorized user")
     signed_url = get_profile_image_signed_url(user.profile_image)
 
     user_data = UserInfoResponse(

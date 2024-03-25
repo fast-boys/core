@@ -11,7 +11,7 @@ class User(Base):
     provider_id = Column(String(255), index=True)
     provider = Column(String(255))
     # internal_id = Column(UUID(as_uuid=True), default=uuid.uuid4)
-    internal_id = Column(String(36), default=uuid.uuid4)
+    internal_id = Column(String(36), nullable=False, unique=True, index=True)
     nickname = Column(String(255))
     profile_image = Column(String(255), nullable=True)
     survey_status = Column(Boolean, default=False)
