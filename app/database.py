@@ -66,7 +66,7 @@ def init_es_client():
         hosts=[ES_URL],
         ssl_assert_fingerprint=ES_CERT_FINGERPRINT,
         basic_auth=("elastic", ES_PASSWORD),
-        request_timeout=30
+        request_timeout=30,
     )
 
 
