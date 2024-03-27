@@ -29,6 +29,9 @@ origins = [
     "https://localhost:8000",
     "https://j10d204.p.ssafy.io",
     "http://j10d204.p.ssafy.io",
+    "http://localhost:3000",
+    "http://192.168.100.166",
+    "http://localhost:5173",
 ]
 
 # CORS 설정
@@ -59,10 +62,8 @@ async def check_header_middleware(request: Request, call_next):
 
 # 테스트용
 @app.get("/echo")
-def echo(
-    internal_id: str = Depends(get_internal_id),
-):
-    return {"data": "안녕하세요", "internal_id": internal_id}
+def echo():
+    return {"data": "안녕하세요"}
 
 
 # session middleware (client side session)
@@ -80,6 +81,8 @@ app.include_router(profile.router)
 app.include_router(place.router)
 app.include_router(recommend.router)
 app.include_router(travel.router)
+app.include_router(survey.router)
+app.include_router(url.router)
 
 # app 실행 시 마이그레이션 자동 실행 코드
 """
