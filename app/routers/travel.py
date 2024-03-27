@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
-from app.models.plan import Plan
+from models.plan import Plan
 from schemas.travel import MySpotResponse, TravelResponse
 from models.user import User
 from database import get_db

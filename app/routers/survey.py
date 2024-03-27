@@ -78,7 +78,7 @@ async def update_user_vector(
     설문조사를 완료하고, 사용자의 초기 벡터를 업데이트합니다.
 
     - **spots**: 설문조사에서 선택된 관광지 spot_id의 리스트입니다.
-    - **internal_id**: 사용자의 내부 식별자입니다. (DI원칙으로 자동주입)
+    - **internal_id**: 사용자의 내부 식별자입니다. (Header)
     """
     # User Info 조회
     user = db.query(User).filter(User.internal_id == internal_id).first()

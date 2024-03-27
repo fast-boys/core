@@ -9,5 +9,3 @@ class City(Base):
     id = Column(BigInteger, primary_key=True, index=True)
     name = Column(String(255), nullable=True)
     title_image_url = Column(String(255), nullable=True)
-
-    plan_citys = relationship("PlanCity", back_populates="city")

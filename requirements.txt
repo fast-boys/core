@@ -12,3 +12,5 @@ elasticsearch~=8.12.1
 hvac~=2.1.0
 numpy~=1.24.4
 pillow~=10.2.0
+requests~=2.31.0
+beautifulsoup4~=4.12.3
