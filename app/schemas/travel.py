@@ -21,7 +21,7 @@ class MySpotResponse(BaseModel):
 
 
 class IPlace(BaseModel):
-    id: str
+    id: int
     name: str
     category: List[str]
     lat: str
@@ -29,7 +29,7 @@ class IPlace(BaseModel):
 
 
 class IDay(BaseModel):
-    id: str
+    id: int
     day: str
     placeIds: List[str]
 
@@ -41,18 +41,17 @@ class IPlan(BaseModel):
 
 
 class PlanDetailResponse(BaseModel):
-    id: str
+    id: int
     info: dict
     plan: IPlan
 
     class Config:
         fields = {
             "info": {
-                "name": "name",
-                "profileImage": "profileImage",
-                "startDate": "startDate",
-                "endDate": "endDate",
-                "travelTags": "travelTags",
-                "cities": "cities",
+                "name": Optional[str],
+                "profileImage": Optional[str],
+                "startDate": Optional[datetime.datetime],
+                "endDate": Optional[datetime.datetime],
+                "cities": Optional[List[str]],
             }
         }

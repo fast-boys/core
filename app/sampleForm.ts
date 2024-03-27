@@ -6,7 +6,6 @@ const dummyData: { data: ITravelDetail } = {
             profileImage: "",
             startDate: "2024.07.12",
             endDate: "2024.07.15",
-            travelTags: ["태그1", "태그2"],
             cities: ["도시1", "도시2", "도시3"],
         },
         plan: {
@@ -35,7 +34,6 @@ export interface ITravelDetail {
         profileImage: string;
         startDate: string;
         endDate: string;
-        travelTags: string[];
         cities: string[];
     };
     plan: IPlan;

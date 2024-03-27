@@ -15,5 +15,4 @@ class Plan(Base):
 
     user = relationship("User", back_populates="plans")
     user_plans = relationship("UserPlan", back_populates="plan")
-    plan_citys = relationship("PlanCity", back_populates="plan")
     visit_places = relationship("VisitPlace", back_populates="plan")

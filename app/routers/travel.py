@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
-from app.models.plan import Plan
-from schemas.travel import MySpotResponse, TravelResponse
+from models.plan import Plan
+from schemas.travel import IPlace, MySpotResponse, PlanDetailResponse, TravelResponse
 from models.user import User
 from database import get_db
 from sqlalchemy.orm import Session
@@ -85,3 +85,26 @@ def get_plan_detail(
     db: Session = Depends(get_db),
 ):
     plan = db.query(Plan).filter(Plan.id == plan_id).first()
+    place = IPlace(
+        id=1,
+        name="312",
+        category=["312"],
+        lat="312",
+        long="312",
+    )
+
+    plan_detail_response = PlanDetailResponse(
+        id=plan_id,
+        info={},
+        plan={},
+    )
+    plan_detail_response.info = {
+        "info": {
+            "name": plan.name,
+            "profileImage": plan.title_image_url,
+            "startDate": plan.start_date,
+            "endDate": plan.end_date,
+            # "travelTags": plan.tags,
+            # "cities": plan.cities,
+        }
+    }

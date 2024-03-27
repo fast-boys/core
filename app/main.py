@@ -10,7 +10,6 @@ from models import (
     user,
     plan,
     user_plan,
-    plan_city,
     visit_place,
     spot,
     city,
@@ -93,6 +92,10 @@ async def startup_event():
     # 마이그레이션 업그레이드 명령 실행
     command.upgrade(alembic_cfg, "head")
 """
+
+from celery_config import celery_app
+
+celery_app.send_task("process_data", args=["asdf"])
 
 
 def local_run():
