@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
+from app.models.plan import Plan
 from schemas.travel import MySpotResponse, TravelResponse
 from models.user import User
 from database import get_db
@@ -66,3 +67,21 @@ async def get_like_trip_list(
         return response
 
     raise HTTPException(status_code=401, detail="Unauthorized user")
+
+
+@router.post("/create")
+def create_trip(
+    datas: str,
+    internal_id: str = Depends(get_internal_id),
+    db: Session = Depends(get_db),
+):
+    pass
+
+
+@router.get("/plan/{plan_id}")
+def get_plan_detail(
+    plan_id: int,
+    internal_id: str = Depends(get_internal_id),
+    db: Session = Depends(get_db),
+):
+    plan = db.query(Plan).filter(Plan.id == plan_id).first()

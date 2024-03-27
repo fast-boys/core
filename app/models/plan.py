@@ -7,7 +7,7 @@ class Plan(Base):
     __tablename__ = "plans"
 
     id = Column(BigInteger, primary_key=True, index=True)
-    internal_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
+    creator_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
     name = Column(String(255), nullable=True)
     start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
