@@ -10,4 +10,5 @@ pydantic~=2.6.4
 python-dotenv~=1.0.1
 elasticsearch~=8.12.1
 hvac~=2.1.0
-numpy~=1.24.4sen
+numpy~=1.24.4
+pillow~=10.2.0

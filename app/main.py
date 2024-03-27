@@ -32,6 +32,7 @@ origins = [
     "http://j10d204.p.ssafy.io",
     "http://localhost:3000",
     "http://192.168.100.166",
+    "http://localhost:5173",
 ]
 
 # CORS 설정
