@@ -91,7 +91,7 @@ async def load_url(
 
 
 @router.delete(path="/", status_code=status.HTTP_200_OK)
-async def load_url(
+async def delete_url(
     url_id: str,
     internal_id: str = Depends(get_internal_id),
     db: Any = Depends(get_db),
