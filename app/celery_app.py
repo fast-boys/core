@@ -28,9 +28,10 @@ celery_core = Celery(
     include=["app.celery_app"],
 )
 celery_core.autodiscover_tasks()
+celery_core.conf.task_default_queue = "core_to_ai_queue"
 
 
-@shared_task(name="core_worker.process_data")
+@shared_task(name="core_worker.process_data", queue="ai_to_core_queue")
 def process_data(data: dict):
     # get_db() 제너레이터에서 DB 세션 인스턴스를 얻기
     db = next(get_db())
@@ -57,5 +58,10 @@ def process_data(data: dict):
 
 if __name__ == "__main__":
     celery_core.worker_main(
-        argv=["worker", "--loglevel=info", "--concurrency=4", "-Psolo"]
+        argv=[
+            "worker",
+            "--loglevel=info",
+            "--concurrency=4",
+            "--queues=ai_to_core_queue",
+        ]
     )

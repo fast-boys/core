@@ -24,9 +24,11 @@ router = APIRouter(tags=["User Url"], prefix="/url")
 
 
 def get_core_worker():
-    return Celery(
+    celery = Celery(
         "core_worker", broker=f"{CELERY_REDIS}/0", backend=f"{CELERY_REDIS}/1"
     )
+    celery.conf.task_default_queue = "core_to_ai_queue"
+    return celery
 
 
 @router.post(path="/", status_code=status.HTTP_201_CREATED)
