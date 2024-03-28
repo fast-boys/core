@@ -74,8 +74,8 @@ async def save_url(
     return {"message": "생성 완료.", "url_id": new_url.id}
 
 
-@router.get(path="/", response_model=UrlDto)
-async def load_url(
+@router.get(path="/info", response_model=UrlDto)
+async def load_url_info(
     url_id: str,
     internal_id: str = Depends(get_internal_id),
     db: Any = Depends(get_db),
@@ -89,13 +89,13 @@ async def load_url(
     """
     # User Info 조회
     user = db.query(User).filter(User.internal_id == internal_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="해당하는 유저를 찾을 수 없습니다.")
 
     # Url 조회
     url = db.query(Url).filter(Url.id == url_id).first()
     if url is None:
-        raise HTTPException(status_code=404, detail="해당하는 id의 url 정보를 찾을 수 없습니다.")
+        raise HTTPException(status_code=404, detail="URL 정보를 불러올 수 없습니다.")
+    elif url.creator_id != user.id:
+        raise HTTPException(status_code=401, detail="URL 정보에 접근할 수 없습니다.")
 
     url_dto = UrlDto(
         url=url.url,
@@ -106,6 +106,41 @@ async def load_url(
     )
 
     return url_dto
+
+
+@router.get(path="/list", response_model=List[UrlDto])
+async def load_url_list(
+    internal_id: str = Depends(get_internal_id),
+    db: Any = Depends(get_db),
+):
+    """
+    url_id를 기반으로 해당 URL의 정보를 불러옵니다.
+
+     - :param **url_id**: URL 고유 번호
+     - :param **internal_id**: 사용자 내부 아이디 (Header)
+     - :return **UrlDto**: URL 정보, status로 분석 완료 여부 확인가능
+    """
+    # User Info 조회
+    user = db.query(User).filter(User.internal_id == internal_id).first()
+
+    # Url 조회
+    urls = db.query(Url).filter(Url.creator_id == user.id).all()
+    if not urls:
+        raise HTTPException(status_code=404, detail="사용자의 url 정보를 찾을 수 없습니다.")
+
+    url_dtos = [
+        UrlDto(
+            url_id=url.id,
+            url=url.url,
+            title=url.title,
+            image=url.image,
+            description=url.description,
+            status=url.status,
+        )
+        for url in urls
+    ]
+
+    return url_dtos
 
 
 @router.delete(path="/", status_code=status.HTTP_200_OK)

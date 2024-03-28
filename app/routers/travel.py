@@ -16,7 +16,12 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
-from services.gcs import create_plan_secure_path, create_secure_path, process_profile_image, upload_to_open_gcs
+from services.gcs import (
+    create_plan_secure_path,
+    create_secure_path,
+    process_profile_image,
+    upload_to_open_gcs,
+)
 from routers.place import get_details
 from models.plan import Plan
 from schemas.travel import (
