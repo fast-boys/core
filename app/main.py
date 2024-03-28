@@ -6,16 +6,7 @@ from routers import profile, place, recommend, travel, survey, url, debug
 import sys
 from fastapi import FastAPI, Request
 import uvicorn
-from models import (
-    user,
-    plan,
-    user_plan,
-    visit_place,
-    spot,
-    city,
-    article,
-    my_spot
-)
+from models import user, plan, user_plan, visit_place, spot, city, article, my_spot
 from database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
 

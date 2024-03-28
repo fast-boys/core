@@ -70,17 +70,23 @@ def delete_iframe(url):
 
 def crawl_naver_blog(url):
     headers = {  # 요청 헤더 설정
-        'User-Agent': 'data-useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
-                      'like Gecko) Chrome/122.0.0.0 Safari/537.36"'}
+        "User-Agent": 'data-useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
+        'like Gecko) Chrome/122.0.0.0 Safari/537.36"'
+    }
 
     response = requests.get(url, headers=headers)
     response.raise_for_status()
-    soup = BeautifulSoup(response.text, 'html.parser')
+    soup = BeautifulSoup(response.text, "html.parser")
 
     title = soup.find("div", attrs={"class": "se-title-text"}).get_text()
     title = title.replace("\n", "")
     text = soup.find("div", attrs={"class": "se-main-container"}).get_text()
     # 필요없는 데이터들 전처리
-    text = text.replace("\n", "").replace(u"\u200b", u"").replace("Previous image", "").replace("Next image", "")
+    text = (
+        text.replace("\n", "")
+        .replace("\u200b", "")
+        .replace("Previous image", "")
+        .replace("Next image", "")
+    )
 
     return " ".join([title, text])

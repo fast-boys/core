@@ -25,9 +25,7 @@ router = APIRouter(tags=["User Url"], prefix="/url")
 
 def get_core_worker():
     return Celery(
-        'core_worker',
-        broker=f'{CELERY_REDIS}/0',
-        backend=f'{CELERY_REDIS}/1'
+        "core_worker", broker=f"{CELERY_REDIS}/0", backend=f"{CELERY_REDIS}/1"
     )
 
 
@@ -141,7 +139,7 @@ async def calculate_url(
     url_id: str,
     internal_id: str = Depends(get_internal_id),
     db: Any = Depends(get_db),
-    celery: Any = Depends(get_core_worker)
+    celery: Any = Depends(get_core_worker),
 ):
     """
     해당하는 URL의 추천 데이터를 생성합니다.
@@ -161,11 +159,13 @@ async def calculate_url(
     # 1. 크롤링 진행
     try:
         # 크롤링 하려는 사이트가 크롤링 가능한지 검증
-        if re.match(r'https?://blog.naver.com/PostView.*', url.url):  # 1. 네이버 PC
+        if re.match(r"https?://blog.naver.com/PostView.*", url.url):  # 1. 네이버 PC
             raw_text = crawl_naver_blog(url.url)
-        elif re.match(r'https?://m.blog.naver.com/.*', url.url):  # 2. 네이버 모바일
+        elif re.match(r"https?://m.blog.naver.com/.*", url.url):  # 2. 네이버 모바일
             raw_text = crawl_naver_blog(url.url)
-        elif re.match(r'https?://blog.naver.com/.*', url.url):  # 3. 네이버 PC (inner iframe)
+        elif re.match(
+            r"https?://blog.naver.com/.*", url.url
+        ):  # 3. 네이버 PC (inner iframe)
             raw_text = crawl_naver_blog(delete_iframe(url.url))
         # elif re.match(r'https?://.*\.tistory.com/.*', url.url):
         #     crawl_tistory(url.url)
@@ -180,8 +180,10 @@ async def calculate_url(
 
     # 2. 임베딩 진행
     # https://docs.celeryq.dev/en/stable/userguide/calling.html
-    task = celery.send_task('ai_worker.vector_embedding',
-                            kwargs={'url_id': url_id, 'raw_text': raw_text})
+    task = celery.send_task(
+        "ai_worker.vector_embedding",
+        kwargs={"url_id": url_id, "raw_text": raw_text},
+    )
     return {"message": "전달 완료. [core -> ai]", "task_id": task.id}
 
 
@@ -190,12 +192,12 @@ def get_calculated_result(
     url_id: str,
     db: Any = Depends(get_db),
     es: Any = Depends(get_es_client),
-    collection: Any = Depends(get_m_db)
+    collection: Any = Depends(get_m_db),
 ):
     # 모든 갱신 작업은 core_worker에 이관하였으므로, status만 조회하면 됨
     # Url 조회
     url = db.query(Url).filter(Url.id == url_id).first()
-    
+
     if not url.status:
         raise HTTPException(status_code=400, detail="해당 URL에 대한 추천 벡터가 생성되지 않았습니다.")
 
@@ -209,19 +211,18 @@ def get_calculated_result(
             "field": "text_vector",
             "query_vector": url_vector,
             "k": 11,
-            "num_candidates": 100
+            "num_candidates": 100,
         },
         "fields": ["name", "spot_id"],
-        "size": 11
+        "size": 11,
     }
 
     try:
-        knn_response = es.search(
-            index=index_name,
-            body=knn_query
-        )
+        knn_response = es.search(index=index_name, body=knn_query)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Elasticsearch 검색 중 예외가 발생했습니다: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Elasticsearch 검색 중 예외가 발생했습니다: {e}"
+        )
 
     # 유사한 관광지 저장
     similar_spots = []

@@ -12,9 +12,7 @@ router = APIRouter(tags=["Debugger"], prefix="/debug")
 
 def get_core_worker():
     return Celery(
-        'core_worker',
-        broker=f'{CELERY_REDIS}/0',
-        backend=f'{CELERY_REDIS}/1'
+        "core_worker", broker=f"{CELERY_REDIS}/0", backend=f"{CELERY_REDIS}/1"
     )
 
 
@@ -25,6 +23,3 @@ def get_result(task_id: str, celery: Any = Depends(get_core_worker)):
     """
     task_result = AsyncResult(task_id, app=celery)
     return {"status": task_result.status, "result": task_result.result}
-
-
-
