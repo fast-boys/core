@@ -1,3 +1,4 @@
+import json
 import os
 from typing import List
 from fastapi import APIRouter, Depends, Form, HTTPException, Request, Response, UploadFile
@@ -77,18 +78,20 @@ def create_trip(
     profileImage: UploadFile = Form(...),
     startDate: str = Form(...),
     endDate: str = Form(...),
-    cities: List[str] = Form(...),
+    cities: str = Form(...),
     internal_id: str = Depends(get_internal_id),
     db: Session = Depends(get_db),
 ):
+    user = db.query(User).filter(User.internal_id == internal_id).first()
+
     trip_data = TripCreateForm(
         profileName=profileName,
-        startDate=startDate,  # Pydantic이 자동으로 date 객체로 변환
-        endDate=endDate,  # Pydantic이 자동으로 date 객체로 변환
-        cities=cities,
+        startDate=startDate.split("T")[0],  # Pydantic이 자동으로 date 객체로 변환
+        endDate=endDate.split("T")[0],  # Pydantic이 자동으로 date 객체로 변환
+        cities=json.loads(cities),
     )
     plan = Plan(
-        creator_id=internal_id,
+        creator_id=user.id,
         name=trip_data.profileName,
         start_date=trip_data.startDate,
         end_date=trip_data.endDate,
