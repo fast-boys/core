@@ -98,6 +98,7 @@ async def load_url_info(
         raise HTTPException(status_code=401, detail="URL 정보에 접근할 수 없습니다.")
 
     url_dto = UrlDto(
+        url_id=url.id,
         url=url.url,
         title=url.title,
         image=url.image,
