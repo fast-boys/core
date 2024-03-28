@@ -16,7 +16,9 @@ from PIL import Image
 # .env 파일에서 서비스 계정 JSON을 가져옴
 service_account_info = json.loads(get_env_value("GCP_SERVICE_ACCOUNT_JSON"))
 # 서비스 계정 정보를 사용하여 인증 정보 생성
-credentials = service_account.Credentials.from_service_account_info(service_account_info)
+credentials = service_account.Credentials.from_service_account_info(
+    service_account_info
+)
 # 인증 정보를 사용하여 Storage 클라이언트 생성
 storage_client = storage.Client(credentials=credentials)
 
