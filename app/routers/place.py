@@ -34,6 +34,7 @@ async def get_details(spot_id: str, collection: Any = Depends(get_m_db)):
         image_urls=spot.get("depiction") if spot.get("depiction") else [],
         lat=spot.get("lat", ""),
         long=spot.get("long", ""),
+        category=spot.get("category"),
         # 상세 정보 고유 데이터
         description=spot.get("description", ""),
         tel=properties.get("tel"),

@@ -1,14 +1,31 @@
 import os
 from typing import List
+from fastapi import (
+    APIRouter,
+    Depends,
+    Form,
+    HTTPException,
+    Request,
+    Response,
+    UploadFile,
+)
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
+from routers.place import get_details
 from models.plan import Plan
-from schemas.travel import IPlace, MySpotResponse, PlanDetailResponse, TravelResponse
+from schemas.travel import (
+    IPlace,
+    IPlan,
+    MySpotResponse,
+    PlanDetailResponse,
+    TravelResponse,
+    TripCreateForm,
+)
 from models.user import User
-from database import get_db
+from database import get_db, get_m_db
 from sqlalchemy.orm import Session
 
 from services.profile import get_internal_id
@@ -44,45 +61,10 @@ async def get_trip_list(
     raise HTTPException(status_code=401, detail="Unauthorized user")
 
 
-@router.post("/like/update")
-async def update_like_trip(
-    lile_list: List[str],
-    internal_id: str = Depends(get_internal_id),
-    db: Session = Depends(get_db),
-):
-    # 사용자 검증
-    user = db.query(User).filter(User.internal_id == internal_id).first()
-    if not user:
-        raise HTTPException(status_code=401, detail="Unauthorized user")
-
-    # '좋아요' 상태 업데이트
-    my_spot = (
-        db.query(MySpot)
-        .filter(MySpot.user_id == user.id, MySpot.location_id == like_data.location_id)
-        .first()
-    )
-
-    if like_data.like:
-        # '좋아요' 추가
-        if not my_spot:
-            new_like = MySpot(user_id=user.id, location_id=like_data.location_id)
-            db.add(new_like)
-            db.commit()
-            return {"message": "Location liked successfully"}
-        else:
-            return {"message": "Location is already liked"}
-    else:
-        # '좋아요' 취소
-        if my_spot:
-            db.delete(my_spot)
-            db.commit()
-            return {"message": "Location unliked successfully"}
-        else:
-            return {"message": "Location was not liked"}
-
-
 @router.get("/like/list")
-async def get_my_spots(
+async def get_like_trip_list(
+    request: Request,
+    response: Response,
     internal_id: str = Depends(get_internal_id),
     db: Session = Depends(get_db),
 ):
