@@ -8,7 +8,7 @@ class TripCreateForm(BaseModel):
     profileName: str
     startDate: date
     endDate: date
-    cities: List[str]
+    cities: List[int]
 
 
 class TravelResponse(BaseModel):

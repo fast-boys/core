@@ -12,4 +12,3 @@ class MySpot(Base):
     created_date = Column(String(255), nullable=True)
 
     user = relationship("User", back_populates="my_spots")
-    spot = relationship("Spot", back_populates="my_spots")
