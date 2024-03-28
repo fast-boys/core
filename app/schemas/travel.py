@@ -37,24 +37,18 @@ class MySpotResponse(BaseModel):
     locationMemo: Optional[str] = None
 
 
-class IPlace(BaseModel):
-    id: int
+class ISpot(BaseModel):
+    id: str
     name: str
     category: List[str]
     lat: str
     long: str
 
 
-class IDay(BaseModel):
-    id: int
-    day: str
-    placeIds: List[str]
-
-
 class IPlan(BaseModel):
-    places: Dict[str, IPlace]
-    days: Dict[str, IDay]
-    dayOrder: List[str]
+    places: Optional[Dict[str, ISpot]]
+    days: Optional[Dict[str, List[str]]]
+    dayOrder: Optional[List[str]]
 
 
 class PlanDetailResponse(BaseModel):

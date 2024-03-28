@@ -25,8 +25,8 @@ from services.gcs import (
 from routers.place import get_details
 from models.plan import Plan
 from schemas.travel import (
-    IPlace,
     IPlan,
+    ISpot,
     MySpotRequest,
     MySpotResponse,
     PlanDetailResponse,
@@ -158,34 +158,41 @@ async def get_plan_detail(
     collection: Session = Depends(get_m_db),
 ):
     plan = db.query(Plan).filter(Plan.id == plan_id).first()
-    places = []
+    places = {}
     dayorder = set()
-    for spot in plan.visit_places:
-        spot_id = spot.spot_id
-        date = spot.date
+    days = {}
+
+    for visited_spot in plan.visit_spots:
+        spot_id = visited_spot.spot_id
+        date = visited_spot.date
         # 지역 정보 탐색
         tour_spot = await get_details(spot_id, collection)
-        spot = IPlace(
+        spot = ISpot(
             id=tour_spot.id,
             name=tour_spot.name,
             category=tour_spot.category,
             lat=tour_spot.lat,
             long=tour_spot.long,
         )
-        places.append(spot)
+        places.append({spot_id: spot})
         # 날짜별 정보
         dayorder.add(date)
 
-    plan = IPlan(
+        if visited_spot.date not in days:
+            days[visited_spot.date] = []
+        else:
+            days[visited_spot.date].add("spot_id")
+    print(list(dayorder))
+    iplan = IPlan(
         places=places,
-        start_date=plan.start_date,
-        end_date=plan.end_date,
-        spot=spot,
+        days=days,
+        dayOrder=list(dayorder),
     )
+
     plan_detail_response = PlanDetailResponse(
         id=plan_id,
         info={},
-        plan={},
+        plan=iplan,
     )
     plan_detail_response.info = {
         "info": {
@@ -193,6 +200,7 @@ async def get_plan_detail(
             "profileImage": plan.title_image_url,
             "startDate": plan.start_date,
             "endDate": plan.end_date,
-            # "cities": plan.cities,
+            "cities": plan.cities,
         }
     }
+    return plan_detail_response
