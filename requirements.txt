@@ -16,3 +16,4 @@ requests~=2.31.0
 beautifulsoup4~=4.12.3
 celery~=5.3.6
 starlette~=0.36.3
+redis~=5.0.3

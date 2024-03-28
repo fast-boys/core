@@ -6,7 +6,7 @@ from routers import profile, place, recommend, travel, survey, url, debug
 import sys
 from fastapi import FastAPI, Request
 import uvicorn
-from models import user, plan, user_plan, visit_place, spot, city, article, my_spot
+from models import user, plan, user_plan, city, article, my_spot, visit_place
 from database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -23,6 +23,8 @@ origins = [
     "http://localhost:3000",
     "http://192.168.100.166",
     "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
 ]
 
 # CORS 설정

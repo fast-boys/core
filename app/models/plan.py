@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, Date, String, Time, ForeignKey
+from sqlalchemy import JSON, Column, BigInteger, Date, String, Time, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -12,7 +12,7 @@ class Plan(Base):
     start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
     title_image_url = Column(String(255), nullable=True)
-
+    cities = Column(JSON, nullable=True)
     user = relationship("User", back_populates="plans")
     user_plans = relationship("UserPlan", back_populates="plan")
     visit_places = relationship("VisitPlace", back_populates="plan")

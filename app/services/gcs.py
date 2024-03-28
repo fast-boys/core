@@ -16,9 +16,7 @@ from PIL import Image
 # .env 파일에서 서비스 계정 JSON을 가져옴
 service_account_info = json.loads(get_env_value("GCP_SERVICE_ACCOUNT_JSON"))
 # 서비스 계정 정보를 사용하여 인증 정보 생성
-credentials = service_account.Credentials.from_service_account_info(
-    service_account_info
-)
+credentials = service_account.Credentials.from_service_account_info(service_account_info)
 # 인증 정보를 사용하여 Storage 클라이언트 생성
 storage_client = storage.Client(credentials=credentials)
 
@@ -85,6 +83,13 @@ def create_secure_path(user_id, file_extension):
     # 사용자 ID를 해싱하여 파일 경로에 사용할 고유한 문자열을 생성
     secure_hash = hashlib.sha256(str(user_id).encode()).hexdigest()
     return f"profiles/{secure_hash}/profile_image/profile_{date_str}{file_extension}"
+
+
+def create_plan_secure_path(user_id, file_extension):
+    date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    # 사용자 ID를 해싱하여 파일 경로에 사용할 고유한 문자열을 생성
+    secure_hash = hashlib.sha256(str(user_id).encode()).hexdigest()
+    return f"plans/{secure_hash}/plans_image/plan_{date_str}{file_extension}"
 
 
 def generate_signed_url(blob_path: str, expiration: int = 600) -> str:

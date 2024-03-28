@@ -1,6 +1,14 @@
 import datetime
 from typing import Optional, Dict, List
 from pydantic import BaseModel
+from datetime import date
+
+
+class TripCreateForm(BaseModel):
+    profileName: str
+    startDate: date
+    endDate: date
+    cities: List[int]
 
 
 class TravelResponse(BaseModel):
@@ -12,6 +20,15 @@ class TravelResponse(BaseModel):
     numOfCity: int
 
 
+class MySpotRequest(BaseModel):
+    """
+    사용자 좋아요 갱신 시 필요한 정보,
+    """
+
+    spot_id: str  # 관광지 고유 식별자
+    is_like: bool
+
+
 class MySpotResponse(BaseModel):
     locationId: int
     locationImage: Optional[str] = None
@@ -21,7 +38,7 @@ class MySpotResponse(BaseModel):
 
 
 class IPlace(BaseModel):
-    id: str
+    id: int
     name: str
     category: List[str]
     lat: str
@@ -29,7 +46,7 @@ class IPlace(BaseModel):
 
 
 class IDay(BaseModel):
-    id: str
+    id: int
     day: str
     placeIds: List[str]
 
@@ -41,18 +58,17 @@ class IPlan(BaseModel):
 
 
 class PlanDetailResponse(BaseModel):
-    id: str
+    id: int
     info: dict
     plan: IPlan
 
     class Config:
         fields = {
             "info": {
-                "name": "name",
-                "profileImage": "profileImage",
-                "startDate": "startDate",
-                "endDate": "endDate",
-                "travelTags": "travelTags",
-                "cities": "cities",
+                "name": Optional[str],
+                "profileImage": Optional[str],
+                "startDate": Optional[datetime.datetime],
+                "endDate": Optional[datetime.datetime],
+                "cities": Optional[List[str]],
             }
         }
