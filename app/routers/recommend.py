@@ -23,6 +23,8 @@ async def get_recommendations(
 ):
     """
     해당 유저의 사용자 벡터를 기반으로 추천 관광지를 10개 반환합니다.
+
+    - :param **internal_id**: 사용자 내부 아이디 (HEADER)
     - :return **List[SimpleSpotDto]**: 유사한 관광지 리스트 반환
     """
     # User Info 조회

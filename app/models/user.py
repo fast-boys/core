@@ -33,15 +33,3 @@ class User(Base):
     user_plans = relationship("UserPlan", back_populates="user")
     my_spots = relationship("MySpot", back_populates="user")
     urls = relationship("Url", back_populates="user")
-
-
-class Url(Base):
-    __tablename__ = "urls"
-
-    id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
-    url = Column(String(255), nullable=True)
-    title = Column(String(255), nullable=True)
-    memo = Column(String(255), nullable=True)
-    created_at = Column(String(255), nullable=True)
-
-    user = relationship("User", back_populates="urls")

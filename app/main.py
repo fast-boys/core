@@ -2,20 +2,11 @@ from multiprocessing import Process
 
 from fastapi.responses import JSONResponse
 from vault_client import get_env_value
-from routers import profile, place, recommend, travel, survey
+from routers import profile, place, recommend, travel, survey, url, debug
 import sys
 from fastapi import FastAPI, Request
 import uvicorn
-from models import (
-    user,
-    plan,
-    user_plan,
-    visit_place,
-    spot,
-    city,
-    article,
-    my_spot,
-)
+from models import user, plan, user_plan, visit_place, spot, city, article, my_spot
 from database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -82,6 +73,8 @@ app.include_router(place.router)
 app.include_router(recommend.router)
 app.include_router(travel.router)
 app.include_router(survey.router)
+app.include_router(url.router)
+app.include_router(debug.router)
 
 # app 실행 시 마이그레이션 자동 실행 코드
 """

@@ -13,7 +13,9 @@ router = APIRouter(tags=["User Survey"], prefix="/survey")
 
 
 @router.get(path="/random_spot", response_model=List[SimpleSpotDto])
-async def get_random_spot(category: int, count: int = 5, collection: Any = Depends(get_m_db)):
+async def get_random_spot(
+    category: int, count: int = 5, collection: Any = Depends(get_m_db)
+):
     """
     특정 카테고리에 해당하는 랜덤 관광지를 반환합니다.
 
@@ -37,7 +39,9 @@ async def get_random_spot(category: int, count: int = 5, collection: Any = Depen
     """
     # 카테고리 번호 유효성 검사
     if category < 1 or category > 11:
-        raise HTTPException(status_code=400, detail=f"category={category} 가 유효한 값이 아닙니다.")
+        raise HTTPException(
+            status_code=400, detail=f"category={category} 가 유효한 값이 아닙니다."
+        )
 
     pipeline = [
         {
@@ -74,7 +78,7 @@ async def update_user_vector(
     설문조사를 완료하고, 사용자의 초기 벡터를 업데이트합니다.
 
     - **spots**: 설문조사에서 선택된 관광지 spot_id의 리스트입니다.
-    - **internal_id**: 사용자의 내부 식별자입니다. (DI원칙으로 자동주입)
+    - **internal_id**: 사용자의 내부 식별자입니다. (Header)
     """
     # User Info 조회
     user = db.query(User).filter(User.internal_id == internal_id).first()

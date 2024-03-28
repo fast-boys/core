@@ -4,7 +4,11 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
 from models.plan import Plan
+<<<<<<< HEAD
 from schemas.travel import IPlace, MySpotResponse, PlanDetailResponse, TravelResponse
+=======
+from schemas.travel import MySpotResponse, TravelResponse
+>>>>>>> b8df7fc6f6bcc33eb1f00b203240339d2a0149b0
 from models.user import User
 from database import get_db
 from sqlalchemy.orm import Session

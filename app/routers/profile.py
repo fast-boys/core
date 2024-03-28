@@ -14,7 +14,12 @@ from fastapi import (
 )
 
 from schemas.profile import UserInfoResponse
-from services.gcs import create_secure_path, process_profile_image, upload_to_gcs, upload_to_open_gcs
+from services.gcs import (
+    create_secure_path,
+    process_profile_image,
+    upload_to_gcs,
+    upload_to_open_gcs,
+)
 from services.profile import get_profile_image_signed_url
 from services.profile import get_internal_id
 from database import get_db
