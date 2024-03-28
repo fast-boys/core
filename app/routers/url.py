@@ -130,6 +130,7 @@ async def load_url_list(
 
     url_dtos = [
         UrlDto(
+            url_id=url.id,
             url=url.url,
             title=url.title,
             image=url.image,

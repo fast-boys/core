@@ -7,6 +7,7 @@ class UrlDto(BaseModel):
     URL 데이터 교환을 위한 DTO
     """
 
+    url_id: int
     url: str
     status: bool
     title: Optional[str] = None
