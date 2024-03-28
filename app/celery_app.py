@@ -63,5 +63,6 @@ if __name__ == "__main__":
             "--loglevel=info",
             "--concurrency=4",
             "--queues=ai_to_core_queue",
+            "-Psolo",
         ]
     )
