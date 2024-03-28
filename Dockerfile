@@ -17,6 +17,9 @@ COPY . .
 ARG VAULT_TOKEN
 ENV VAULT_TOKEN=$VAULT_TOKEN
 
+# log 기록용 폴더
+RUN mkdir -p /etc/log
+
 # supervisord.conf 파일을 컨테이너에 복사합니다.
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
