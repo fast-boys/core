@@ -12,9 +12,9 @@ class TripCreateForm(BaseModel):
 
 
 class TravelResponse(BaseModel):
-    travelId: int
-    travelImage: Optional[str] = None
-    travelName: str
+    planId: int
+    planImage: Optional[str] = None
+    planName: str
     startDate: datetime.date
     endDate: datetime.date
     numOfCity: int

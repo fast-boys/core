@@ -57,12 +57,12 @@ async def get_trip_list(
         # plans는 Plan 인스턴스의 리스트입니다. 필요에 따라 이를 처리할 수 있습니다.
         for plan in plans:
             res = TravelResponse(
-                travelId=plan.id,
-                travelImage=plan.title_image_url,
-                travelName=plan.name,
+                planId=plan.id,
+                planImage=plan.title_image_url,
+                planName=plan.name,
                 startDate=plan.start_date,
                 endDate=plan.end_date,
-                numOfCity=len(plan.plan_citys),
+                numOfCity=len(plan.cities),
             )
             response.append(res)
         return response
