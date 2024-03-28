@@ -5,7 +5,7 @@ import hvac
 import numpy as np
 
 from database import get_db
-from models import user, plan, user_plan, visit_place, spot, city, article, my_spot, url
+from models import user, plan, user_plan, visit_place, city, article, my_spot, url
 from models.url import Url
 
 load_dotenv()
@@ -63,5 +63,6 @@ if __name__ == "__main__":
             "--loglevel=info",
             "--concurrency=4",
             "--queues=ai_to_core_queue",
+            "-Psolo",
         ]
     )

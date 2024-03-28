@@ -2,14 +2,32 @@ from io import BytesIO
 import json
 import os
 from typing import List
-from fastapi import APIRouter, Depends, Form, HTTPException, Request, Response, UploadFile
+from fastapi import (
+    APIRouter,
+    Depends,
+    Form,
+    HTTPException,
+    Request,
+    Response,
+    UploadFile,
+)
+
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
 from services.gcs import create_plan_secure_path, create_secure_path, process_profile_image, upload_to_open_gcs
 from routers.place import get_details
 from models.plan import Plan
-from schemas.travel import IPlace, IPlan, MySpotResponse, PlanDetailResponse, TravelResponse, TripCreateForm
+from schemas.travel import (
+    IPlace,
+    IPlan,
+    MySpotRequest,
+    MySpotResponse,
+    PlanDetailResponse,
+    TravelResponse,
+    TripCreateForm,
+)
 from models.user import User
 from database import get_db, get_m_db
 from sqlalchemy.orm import Session
