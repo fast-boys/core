@@ -1,6 +1,14 @@
 import datetime
 from typing import Optional, Dict, List
 from pydantic import BaseModel
+from datetime import date
+
+
+class TripCreateForm(BaseModel):
+    profileName: str
+    startDate: date
+    endDate: date
+    cities: List[str]
 
 
 class TravelResponse(BaseModel):

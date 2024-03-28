@@ -19,9 +19,7 @@ async def get_details(spot_id: str, collection: Any = Depends(get_m_db)):
     """
     spot = collection.find_one({"spot_id": {"$eq": spot_id}})
     if spot is None:  # 해당 spot_id를 가진 문서를 찾을 수 없음
-        raise HTTPException(
-            status_code=404, detail=f"Spot ID {spot_id}에 해당하는 관광지를 찾을 수 없습니다."
-        )
+        raise HTTPException(status_code=404, detail=f"Spot ID {spot_id}에 해당하는 관광지를 찾을 수 없습니다.")
 
     properties = spot.get("properties", {})
 
@@ -34,6 +32,7 @@ async def get_details(spot_id: str, collection: Any = Depends(get_m_db)):
         image_urls=spot.get("depiction") if spot.get("depiction") else [],
         lat=spot.get("lat", ""),
         long=spot.get("long", ""),
+        category=spot.get("category"),
         # 상세 정보 고유 데이터
         description=spot.get("description", ""),
         tel=properties.get("tel"),
