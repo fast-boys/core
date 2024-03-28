@@ -56,6 +56,4 @@ def process_data(data: dict):
 
 
 if __name__ == "__main__":
-    celery_core.worker_main(
-        argv=["worker", "--loglevel=info", "--concurrency=4", "-Psolo"]
-    )
+    celery_core.worker_main(argv=["worker", "--loglevel=info", "--concurrency=4", "-Psolo"])

@@ -86,10 +86,6 @@ async def startup_event():
     command.upgrade(alembic_cfg, "head")
 """
 
-from celery_config import celery_app
-
-celery_app.send_task("process_data", args=["asdf"])
-
 
 def local_run():
     uvicorn.run(
