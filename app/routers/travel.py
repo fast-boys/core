@@ -19,6 +19,7 @@ from models.plan import Plan
 from schemas.travel import (
     IPlace,
     IPlan,
+    MySpotRequest,
     MySpotResponse,
     PlanDetailResponse,
     TravelResponse,
