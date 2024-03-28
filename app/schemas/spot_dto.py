@@ -37,7 +37,7 @@ class DetailSpotDto(SpotBaseDto):
     description: str  # 관광지 설명
     lat: str  # 위도
     long: str  # 경도
-    category: List[str]
+    category: List[int]
     # ------ 아래부터는 있을수도, 없을수도 있음 (Optional) ------
     tel: Optional[str] = None  # 전화번호
     credit_card: Optional[str] = None  # 신용카드 사용 가능 여부
