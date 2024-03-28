@@ -153,10 +153,15 @@ async def calculate_url(
      - :param internal_id: 사용자 내부 아이디 (Header)
      - :return task_id: 해당 task에 대한 id값으로 redis 디버깅용으로 사용됩니다 (프론트 페이지에서 사용 X)
     """
+    # User Info 조회
+    user = db.query(User).filter(User.internal_id == internal_id).first()
+
     # Url 조회
     url = db.query(Url).filter(Url.id == url_id).first()
     if url is None:
-        raise HTTPException(status_code=404, detail="해당하는 id의 url 정보를 찾을 수 없습니다.")
+        raise HTTPException(status_code=404, detail="URL 정보를 불러올 수 없습니다.")
+    elif url.creator_id != user.id:
+        raise HTTPException(status_code=401, detail="URL 정보에 접근할 수 없습니다.")
 
     # 1. 크롤링 진행
     try:
