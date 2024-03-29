@@ -20,23 +20,6 @@ class TravelResponse(BaseModel):
     numOfCity: int
 
 
-class MySpotRequest(BaseModel):
-    """
-    사용자 좋아요 갱신 시 필요한 정보,
-    """
-
-    spot_id: str  # 관광지 고유 식별자
-    is_like: bool
-
-
-class MySpotResponse(BaseModel):
-    locationId: int
-    locationImage: Optional[str] = None
-    locationName: str
-    locationAddress: str
-    locationMemo: Optional[str] = None
-
-
 class IPlace(BaseModel):
     id: int
     name: str

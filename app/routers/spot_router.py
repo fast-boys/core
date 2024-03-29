@@ -1,15 +1,14 @@
-from fastapi import APIRouter, Depends, Path, Request, Response, HTTPException
-from typing import Any, List
-from fastapi.security import HTTPBearer
+from fastapi import APIRouter, Depends, HTTPException
+from pymongo import MongoClient
 
 from database import get_m_db
 from schemas.spot_dto import DetailSpotDto
 
-router = APIRouter(tags=["place"], prefix="/place")
+router = APIRouter(tags=["Spot"], prefix="/spot")
 
 
 @router.get(path="/{spot_id}", response_model=DetailSpotDto)
-async def get_details(spot_id: str, collection: Any = Depends(get_m_db)):
+async def get_details(spot_id: str, collection: MongoClient = Depends(get_m_db)):
     """
     spot_id 를 지닌 관광지에 대한 Detail 정보를 반환합니다.
 
