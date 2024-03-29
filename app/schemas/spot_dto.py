@@ -19,12 +19,21 @@ class SimpleSpotDto(SpotBaseDto):
     """
 
 
-# class ResultSpotDto(SpotBaseDto):
-#     """
-#     검색 결과에 표시되는 관광지 정보 DTO
-#     """
-#     lat: str   # 위도
-#     long: str  # 경도
+class MySpotResponseDto(SpotBaseDto):
+    """
+    내 여행지 페이지에 띄워줄 response dto
+    """
+
+    memo: str
+
+
+class MySpotRequestDto(BaseModel):
+    """
+    좋아요한 여행지 추가할 시 request dto
+    """
+
+    spot_id: str
+    memo: str
 
 
 class DetailSpotDto(SpotBaseDto):
@@ -37,7 +46,7 @@ class DetailSpotDto(SpotBaseDto):
     description: str  # 관광지 설명
     lat: str  # 위도
     long: str  # 경도
-    category: List[str]
+    category: List[int]
     # ------ 아래부터는 있을수도, 없을수도 있음 (Optional) ------
     tel: Optional[str] = None  # 전화번호
     credit_card: Optional[str] = None  # 신용카드 사용 가능 여부
