@@ -82,10 +82,10 @@ app.add_middleware(
 """
 
 
-app.include_router(profile.router)
+app.include_router(profile_router.router)
 app.include_router(spot_router.router)
 app.include_router(recommend_router.router)
-app.include_router(travel.router)
+app.include_router(travel_router.router)
 app.include_router(survey_router.router)
 app.include_router(url_router.router)
 app.include_router(my_spot_router.router)
