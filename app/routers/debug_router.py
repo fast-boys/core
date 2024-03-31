@@ -7,7 +7,7 @@ from vault_client import get_env_value
 
 CELERY_REDIS = get_env_value("CELERY_REDIS")
 
-router = APIRouter(tags=["Debugger"], prefix="/debug")
+router = APIRouter(tags=["메시지 큐 테스트용 Debugger"], prefix="/debug")
 
 
 def get_core_worker():
