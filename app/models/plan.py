@@ -15,4 +15,4 @@ class Plan(Base):
     cities = Column(JSON, nullable=True)
     user = relationship("User", back_populates="plans")
     user_plans = relationship("UserPlan", back_populates="plan")
-    visit_places = relationship("VisitPlace", back_populates="plan")
+    visit_spots = relationship("VisitSpot", back_populates="plan")

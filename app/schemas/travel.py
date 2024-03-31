@@ -12,32 +12,43 @@ class TripCreateForm(BaseModel):
 
 
 class TravelResponse(BaseModel):
-    travelId: int
-    travelImage: Optional[str] = None
-    travelName: str
+    planId: int
+    planImage: Optional[str] = None
+    planName: str
     startDate: datetime.date
     endDate: datetime.date
     numOfCity: int
 
 
-class IPlace(BaseModel):
-    id: int
+class MySpotRequest(BaseModel):
+    """
+    사용자 좋아요 갱신 시 필요한 정보,
+    """
+
+    spot_id: str  # 관광지 고유 식별자
+    is_like: bool
+
+
+class MySpotResponse(BaseModel):
+    locationId: int
+    locationImage: Optional[str] = None
+    locationName: str
+    locationAddress: str
+    locationMemo: Optional[str] = None
+
+
+class ISpot(BaseModel):
+    id: str
     name: str
     category: List[str]
     lat: str
     long: str
 
 
-class IDay(BaseModel):
-    id: int
-    day: str
-    placeIds: List[str]
-
-
 class IPlan(BaseModel):
-    places: Dict[str, IPlace]
-    days: Dict[str, IDay]
-    dayOrder: List[str]
+    places: Optional[Dict[str, ISpot]]
+    days: Optional[Dict[str, List[str]]]
+    dayOrder: Optional[List[str]]
 
 
 class PlanDetailResponse(BaseModel):
