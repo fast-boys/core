@@ -3,10 +3,10 @@ from multiprocessing import Process
 from fastapi.responses import JSONResponse
 from vault_client import get_env_value
 from routers import (
-    profile,
+    profile_router,
     spot_router,
     recommend_router,
-    travel,
+    travel_router,
     survey_router,
     url_router,
     debug_router,
