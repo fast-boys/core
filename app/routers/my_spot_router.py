@@ -100,11 +100,11 @@ async def delete_my_spot(
         raise HTTPException(status_code=404, detail="해당하는 유저를 찾을 수 없습니다.")
 
     # My Spots 조회
-    my_spot = db.query(MySpot).filter(MySpot.id == spot_id).first()
+    my_spot = db.query(MySpot).filter(MySpot.spot_id == spot_id, MySpot.id == user.id).first()
     if my_spot is None:
         raise HTTPException(status_code=404, detail="해당하는 id의 my_spot 정보를 찾을 수 없습니다.")
 
-    # db.delete()
-    # db.commit()
+    db.delete(my_spot)
+    db.commit()
 
     return {"message": "삭제 완료."}
