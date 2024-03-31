@@ -36,13 +36,17 @@ async def get_my_spot_list(
 
     my_spots = user.my_spots
     for my_spot in my_spots:
-        spot_info = spot = collection.find_one({"spot_id": {"$eq": my_spot.id}})
+        spot_info = collection.find_one({"spot_id": {"$eq": str(my_spot.spot_id)}})
+        if spot_info is None:
+            continue  # 관광지 정보가 없는 항목은 건너뜀
+
+        properties = spot_info.get("properties", {})
         # 이미지, 타이틀, 주소, 메모 필요
         res = MySpotResponseDto(
-            spot_id=my_spot.id,
+            spot_id=str(my_spot.spot_id),
             name=spot_info.get("name"),
-            address=spot_info.get("address"),
-            image_url=spot_info.get("image_url"),
+            address=properties.get("address", ""),
+            image_url=spot_info.get("depiction")[0] if spot_info.get("depiction") else "",
             memo=my_spot.memo,
             created_at=my_spot.created_date,
         )
@@ -63,20 +67,23 @@ async def create_my_spot(
     :param **MySpotRequestDto**: 관광지 식별자 및 메모 정보
     :param **internal_id**: 사용자 아이디 헤더
     """
-    # User Info 조회
     user = db.query(User).filter(User.internal_id == internal_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="해당하는 유저를 찾을 수 없습니다.")
 
+    # 이미 있으면 추가 안함
+    existing_spot = db.query(MySpot).filter(MySpot.spot_id == request.spot_id, MySpot.user_id == user.id).first()
+    if existing_spot:
+        return {"message": "이미 추가된 관광지 입니다.", "spot_id": existing_spot.spot_id}
+
     my_spots = user.my_spots
     new_spot = MySpot(
-        id=user.id,
+        user_id=user.id,
         spot_id=request.spot_id,
         memo=request.memo,
         created_date=datetime.utcnow().date(),
     )
 
-    # 이미 있으면 추가 필요
     my_spots.append(new_spot)
     db.commit()
     return {"message": "추가 완료.", "spot_id": new_spot.spot_id}
@@ -94,13 +101,11 @@ async def delete_my_spot(
      - :param **spot_id**: 관광지 식별자
      - :param **internal_id**: 사용자 내부 아이디 (Header)
     """
-    # User Info 조회
     user = db.query(User).filter(User.internal_id == internal_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="해당하는 유저를 찾을 수 없습니다.")
 
-    # My Spots 조회
-    my_spot = db.query(MySpot).filter(MySpot.spot_id == spot_id, MySpot.id == user.id).first()
+    my_spot = db.query(MySpot).filter(MySpot.spot_id == spot_id, MySpot.user_id == user.id).first()
     if my_spot is None:
         raise HTTPException(status_code=404, detail="해당하는 id의 my_spot 정보를 찾을 수 없습니다.")
 
