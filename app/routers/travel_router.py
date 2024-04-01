@@ -16,6 +16,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
+from models.visit_place import VisitSpot
 from services.gcs import (
     create_plan_secure_path,
     create_secure_path,
@@ -191,14 +192,17 @@ async def get_plan_detail(
     if not plan:
         raise HTTPException(status_code=404, detail="Plan not found")
 
+    # 해당 Plan에 연결된 모든 VisitSpot을 찾아서 삭제
+    db.query(VisitSpot).filter(VisitSpot.plan_id == plan.id).delete()
+
     for detail_plan in edit_plan.plans:
         # plan.visit_spots를 초기화 후 다시 추가
-        plan.visit_spots = []
-        plan.visit_spots.append(
-            {
-                "spot_id": detail_plan.spotId,
-                "date": detail_plan.date,
-            }
+        visit_spot = VisitSpot(
+            creator_id=plan.creator_id,
+            plan_id=plan.id,
+            spot_id=detail_plan.spotId,
+            date=detail_plan.date,
         )
+        db.add(visit_spot)
     db.commit()
     return JSONResponse(status_code=200, content={"message": "success"})
