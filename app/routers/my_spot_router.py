@@ -73,7 +73,7 @@ async def create_my_spot(
 
     # 이미 있으면 추가 안함
     existing_spot = db.query(MySpot).filter(MySpot.spot_id == request.spot_id, MySpot.user_id == user.id).first()
-    if existing_spot:
+    if existing_spot.like_status is True:
         return {"message": "이미 추가된 관광지 입니다.", "spot_id": existing_spot.spot_id}
 
     my_spots = user.my_spots
@@ -82,6 +82,7 @@ async def create_my_spot(
         spot_id=request.spot_id,
         memo=request.memo,
         created_date=datetime.utcnow().date(),
+        like_status=True,
     )
 
     my_spots.append(new_spot)
@@ -109,7 +110,7 @@ async def delete_my_spot(
     if my_spot is None:
         raise HTTPException(status_code=404, detail="해당하는 id의 my_spot 정보를 찾을 수 없습니다.")
 
-    db.delete(my_spot)
+    my_spot.like_status = False
     db.commit()
 
     return {"message": "삭제 완료."}
