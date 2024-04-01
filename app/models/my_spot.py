@@ -7,7 +7,7 @@ class MySpot(Base):
     __tablename__ = "my_spots"
 
     id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
-    user_id = Column(BigInteger, ForeignKey('users.id'))
+    user_id = Column(BigInteger, ForeignKey("users.id"))
     spot_id = Column(BigInteger, nullable=False)
     memo = Column(String(255), nullable=True)
     created_date = Column(String(255), nullable=True)

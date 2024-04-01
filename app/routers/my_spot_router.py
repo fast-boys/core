@@ -46,7 +46,9 @@ async def get_my_spot_list(
             spot_id=str(my_spot.spot_id),
             name=spot_info.get("name"),
             address=properties.get("address", ""),
-            image_url=spot_info.get("depiction")[0] if spot_info.get("depiction") else "",
+            image_url=spot_info.get("depiction")[0]
+            if spot_info.get("depiction")
+            else "",
             memo=my_spot.memo,
             created_at=my_spot.created_date,
         )
@@ -72,7 +74,11 @@ async def create_my_spot(
         raise HTTPException(status_code=404, detail="해당하는 유저를 찾을 수 없습니다.")
 
     # 이미 있으면 추가 안함
-    existing_spot = db.query(MySpot).filter(MySpot.spot_id == request.spot_id, MySpot.user_id == user.id).first()
+    existing_spot = (
+        db.query(MySpot)
+        .filter(MySpot.spot_id == request.spot_id, MySpot.user_id == user.id)
+        .first()
+    )
     if existing_spot:
         return {"message": "이미 추가된 관광지 입니다.", "spot_id": existing_spot.spot_id}
 
@@ -105,7 +111,11 @@ async def delete_my_spot(
     if not user:
         raise HTTPException(status_code=404, detail="해당하는 유저를 찾을 수 없습니다.")
 
-    my_spot = db.query(MySpot).filter(MySpot.spot_id == spot_id, MySpot.user_id == user.id).first()
+    my_spot = (
+        db.query(MySpot)
+        .filter(MySpot.spot_id == spot_id, MySpot.user_id == user.id)
+        .first()
+    )
     if my_spot is None:
         raise HTTPException(status_code=404, detail="해당하는 id의 my_spot 정보를 찾을 수 없습니다.")
 
