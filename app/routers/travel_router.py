@@ -210,6 +210,8 @@ async def get_plan_detail(
     collection: MongoClient = Depends(get_m_db),
 ):
     plan = db.query(Plan).filter(Plan.id == plan_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
     places = {}
     dayorder = set()
     days = {}
