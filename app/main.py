@@ -12,6 +12,7 @@ from routers import (
     debug_router,
     my_spot_router,
 )
+from services.scheduler import start_scheduler, rollback_scheduler
 import sys
 from fastapi import FastAPI, Request
 import uvicorn
@@ -58,6 +59,17 @@ async def check_header_middleware(request: Request, call_next):
     #     return JSONResponse(status_code=401, content={"detail": "Unauthorized"})
     response = await call_next(request)
     return response
+
+
+# Fast API 실행 시, 스케쥴러 실행
+@app.on_event("startup")
+async def startup_event():
+    start_scheduler()
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    rollback_scheduler()
 
 
 # 테스트용
