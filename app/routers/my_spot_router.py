@@ -39,7 +39,8 @@ async def get_my_spot_list(
         spot_info = collection.find_one({"spot_id": {"$eq": str(my_spot.spot_id)}})
         if spot_info is None:
             continue  # 관광지 정보가 없는 항목은 건너뜀
-
+        if my_spot.like_status is False:
+            continue  # 좋아요를 누르지 않은 항목은 건너뜀
         properties = spot_info.get("properties", {})
         # 이미지, 타이틀, 주소, 메모 필요
         res = MySpotResponseDto(
@@ -79,7 +80,7 @@ async def create_my_spot(
         .filter(MySpot.spot_id == request.spot_id, MySpot.user_id == user.id)
         .first()
     )
-    if existing_spot:
+    if existing_spot.like_status is True:
         return {"message": "이미 추가된 관광지 입니다.", "spot_id": existing_spot.spot_id}
 
     my_spots = user.my_spots
@@ -88,6 +89,7 @@ async def create_my_spot(
         spot_id=request.spot_id,
         memo=request.memo,
         created_date=datetime.utcnow().date(),
+        like_status=True,
     )
 
     my_spots.append(new_spot)
@@ -119,7 +121,7 @@ async def delete_my_spot(
     if my_spot is None:
         raise HTTPException(status_code=404, detail="해당하는 id의 my_spot 정보를 찾을 수 없습니다.")
 
-    db.delete(my_spot)
+    my_spot.like_status = False
     db.commit()
 
     return {"message": "삭제 완료."}

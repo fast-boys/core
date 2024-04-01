@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import Any, List
 from starlette import status
 
-from services.url import fetch_og_data, delete_iframe, crawl_naver_blog
+from services.url import crawl_tistory, fetch_og_data, delete_iframe, crawl_naver_blog
 from services.profile import get_internal_id
 from database import get_db, get_m_db, get_es_client
 from models.url import Url
@@ -210,8 +210,8 @@ async def calculate_url(
             r"https?://blog.naver.com/.*", url.url
         ):  # 3. 네이버 PC (inner iframe)
             raw_text = crawl_naver_blog(delete_iframe(url.url))
-        # elif re.match(r'https?://.*\.tistory.com/.*', url.url):
-        #     crawl_tistory(url.url)
+        elif re.match(r"https?://.*\.tistory.com/.*", url.url):
+            raw_text = crawl_tistory(url.url)
         # elif re.match(r'https?://(www\.)?youtube\.com/.*', url.url) or re.match(r'https?://youtu\.be/.*', url):
         #     crawl_youtube(url.url)
         else:

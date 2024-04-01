@@ -1,3 +1,4 @@
+from datetime import datetime
 from io import BytesIO
 import json
 import os
@@ -15,7 +16,10 @@ from fastapi import (
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
+from pymongo import MongoClient
 
+from models.user_plan import UserPlan
+from services.plan_utils import get_spot_detail
 from models.visit_place import VisitSpot
 from services.gcs import (
     create_plan_secure_path,
@@ -72,7 +76,7 @@ async def get_trip_list(
     raise HTTPException(status_code=401, detail="Unauthorized user")
 
 
-@router.put("/create")
+@router.post("/")
 async def create_trip(
     profileName: str = Form(...),
     profileImage: UploadFile = Form(...),
@@ -125,14 +129,89 @@ async def create_trip(
     }
 
 
+@router.put("/")
+async def update_plan(
+    planId: str = Form(...),
+    profileName: str = Form(...),
+    profileImage: UploadFile = Form(...),
+    startDate: str = Form(...),
+    endDate: str = Form(...),
+    cities: str = Form(...),
+    internal_id: str = Depends(get_internal_id),
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.internal_id == internal_id).first()
+    plan = db.query(Plan).filter(Plan.id == planId).first()
+    trip_data = TripCreateForm(
+        profileName=profileName,
+        startDate=startDate.split("T")[0],  # Pydantic이 자동으로 date 객체로 변환
+        endDate=endDate.split("T")[0],  # Pydantic이 자동으로 date 객체로 변환
+        cities=json.loads(cities),
+    )
+
+    plan.creator_id = user.id
+    plan.name = trip_data.profileName
+    plan.start_date = trip_data.startDate
+    plan.end_date = trip_data.endDate
+    plan.cities = trip_data.cities
+    db.commit()
+    db.refresh(plan)
+
+    if profileImage and profileImage.filename:
+        image_data = await profileImage.read()
+        image_stream = BytesIO(image_data)
+        # 이미지 처리
+        processed_image = process_profile_image(image_stream)
+        destination_blob_name = create_plan_secure_path(plan.id, "png")
+
+        # 이미지를 GCP에 업로드하고 사인된 URL을 가져옴
+        public_url = upload_to_open_gcs(processed_image, destination_blob_name)
+        plan.title_image_url = public_url
+
+    db.commit()
+    db.refresh(plan)
+
+    return JSONResponse(status_code=200, content={"message": "success"})
+
+
+@router.delete("/")
+async def delete_plan(
+    planId: int,
+    internal_id: str = Depends(get_internal_id),
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.internal_id == internal_id).first()
+    plan = db.query(Plan).filter(Plan.id == planId).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+
+    # 해당 Plan에 연결된 모든 UserPlan 인스턴스를 찾아서 삭제
+    db.query(UserPlan).filter(UserPlan.plan_id == planId).delete()
+
+    # 해당 Plan에 연결된 모든 VisitSpot 인스턴스를 찾아서 삭제
+    db.query(VisitSpot).filter(VisitSpot.plan_id == planId).delete()
+
+    db.delete(plan)
+
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()  # 오류가 발생하면 롤백합니다.
+        print(e)
+        raise HTTPException(status_code=500, detail="An error occurred")
+    return JSONResponse(status_code=200, content={"message": "success"})
+
+
 @router.get("/plan/{plan_id}")
 async def get_plan_detail(
     plan_id: int,
     internal_id: str = Depends(get_internal_id),
     db: Session = Depends(get_db),
-    collection: Session = Depends(get_m_db),
+    collection: MongoClient = Depends(get_m_db),
 ):
     plan = db.query(Plan).filter(Plan.id == plan_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
     places = {}
     dayorder = set()
     days = {}
@@ -141,23 +220,23 @@ async def get_plan_detail(
         spot_id = visited_spot.spot_id
         date = visited_spot.date
         # 지역 정보 탐색
-        tour_spot = await get_details(spot_id, collection)
+        tour_spot = await get_spot_detail(spot_id, collection)
         spot = ISpot(
-            id=tour_spot.id,
+            id=tour_spot.spot_id,
             name=tour_spot.name,
             category=tour_spot.category,
             lat=tour_spot.lat,
             long=tour_spot.long,
         )
-        places.append({spot_id: spot})
+        places[str(spot_id)] = spot
         # 날짜별 정보
-        dayorder.add(date)
+        dayorder.add(str(date))
 
         if visited_spot.date not in days:
             days[visited_spot.date] = []
         else:
-            days[visited_spot.date].add("spot_id")
-    print(list(dayorder))
+            days[visited_spot.date].append("spot_id")
+
     iplan = IPlan(
         places=places,
         days=days,
@@ -201,7 +280,7 @@ async def get_plan_detail(
             creator_id=plan.creator_id,
             plan_id=plan.id,
             spot_id=detail_plan.spotId,
-            date=detail_plan.date,
+            date=datetime.strptime(detail_plan.date, "%Y-%m-%d").date(),
         )
         db.add(visit_spot)
     db.commit()
