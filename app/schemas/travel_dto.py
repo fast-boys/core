@@ -3,6 +3,8 @@ from typing import Optional, Dict, List
 from pydantic import BaseModel
 from datetime import date
 
+from sqlalchemy import Date
+
 
 class TripCreateForm(BaseModel):
     profileName: str
@@ -38,7 +40,7 @@ class MySpotResponse(BaseModel):
 
 
 class IDetailPlan(BaseModel):
-    spotId: int
+    spotId: str
     date: str
 
 
@@ -48,17 +50,17 @@ class IEditDetailPlanRequest(BaseModel):
 
 
 class ISpot(BaseModel):
-    id: str
+    id: int
     name: str
-    category: List[str]
+    category: List[int]
     lat: str
     long: str
 
 
 class IPlan(BaseModel):
     places: Optional[Dict[str, ISpot]]
-    days: Optional[Dict[str, List[str]]]
-    dayOrder: Optional[List[str]]
+    days: Optional[Dict[date, List[str]]]
+    dayOrder: Optional[List[date]]
 
 
 class PlanDetailResponse(BaseModel):

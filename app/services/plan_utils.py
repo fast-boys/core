@@ -1,22 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import Depends, HTTPException
 from pymongo import MongoClient
 
 from database import get_m_db
 from schemas.spot_dto import DetailSpotDto
 
-router = APIRouter(tags=["Spot"], prefix="/spot")
 
-
-@router.get(path="/{spot_id}", response_model=DetailSpotDto)
-async def get_details(spot_id: str, collection: MongoClient = Depends(get_m_db)):
-    """
-    spot_id 를 지닌 관광지에 대한 Detail 정보를 반환합니다.
-
-    아래의 입력을 받아 반환합니다.
-    - :param **spot_id**: 관광지 식별자
-    - :return **DetailSpotDto**: 관광지 상세정보 반환
-    """
-    spot = collection.find_one({"spot_id": {"$eq": spot_id}})
+async def get_spot_detail(spot_id: str, collection: MongoClient):
+    spot = collection.find_one({"spot_id": {"$eq": str(spot_id)}})
     if spot is None:  # 해당 spot_id를 가진 문서를 찾을 수 없음
         raise HTTPException(status_code=404, detail=f"Spot ID {spot_id}에 해당하는 관광지를 찾을 수 없습니다.")
 
@@ -24,7 +14,7 @@ async def get_details(spot_id: str, collection: MongoClient = Depends(get_m_db))
 
     tour_spot = DetailSpotDto(
         # 반드시 필요한 데이터
-        spot_id=spot_id,
+        spot_id=str(spot_id),
         name=spot.get("name"),
         address=spot.get("address", ""),
         image_url=spot.get("depiction")[0] if spot.get("depiction") else "",

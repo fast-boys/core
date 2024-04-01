@@ -1,3 +1,4 @@
+from datetime import datetime
 from io import BytesIO
 import json
 import os
@@ -15,7 +16,9 @@ from fastapi import (
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
+from pymongo import MongoClient
 
+from services.plan_utils import get_spot_detail
 from models.visit_place import VisitSpot
 from services.gcs import (
     create_plan_secure_path,
@@ -191,7 +194,7 @@ async def get_plan_detail(
     plan_id: int,
     internal_id: str = Depends(get_internal_id),
     db: Session = Depends(get_db),
-    collection: Session = Depends(get_m_db),
+    collection: MongoClient = Depends(get_m_db),
 ):
     plan = db.query(Plan).filter(Plan.id == plan_id).first()
     places = {}
@@ -202,23 +205,23 @@ async def get_plan_detail(
         spot_id = visited_spot.spot_id
         date = visited_spot.date
         # 지역 정보 탐색
-        tour_spot = await get_details(spot_id, collection)
+        tour_spot = await get_spot_detail(spot_id, collection)
         spot = ISpot(
-            id=tour_spot.id,
+            id=tour_spot.spot_id,
             name=tour_spot.name,
             category=tour_spot.category,
             lat=tour_spot.lat,
             long=tour_spot.long,
         )
-        places.append({spot_id: spot})
+        places[str(spot_id)] = spot
         # 날짜별 정보
-        dayorder.add(date)
+        dayorder.add(str(date))
 
         if visited_spot.date not in days:
             days[visited_spot.date] = []
         else:
-            days[visited_spot.date].add("spot_id")
-    print(list(dayorder))
+            days[visited_spot.date].append("spot_id")
+
     iplan = IPlan(
         places=places,
         days=days,
@@ -262,7 +265,7 @@ async def get_plan_detail(
             creator_id=plan.creator_id,
             plan_id=plan.id,
             spot_id=detail_plan.spotId,
-            date=detail_plan.date,
+            date=datetime.strptime(detail_plan.date, "%Y-%m-%d").date(),
         )
         db.add(visit_spot)
     db.commit()
