@@ -1,3 +1,4 @@
+from io import BytesIO
 import json
 import os
 from typing import List
@@ -23,7 +24,8 @@ from services.gcs import (
 )
 from routers.spot_router import get_details
 from models.plan import Plan
-from schemas.travel import (
+from schemas.travel_dto import (
+    IEditDetailPlanRequest,
     IPlan,
     ISpot,
     MySpotRequest,
@@ -176,3 +178,27 @@ async def get_plan_detail(
         }
     }
     return plan_detail_response
+
+
+@router.put("/plan/{plan_id}")
+async def get_plan_detail(
+    edit_plan: IEditDetailPlanRequest,
+    internal_id: str = Depends(get_internal_id),
+    db: Session = Depends(get_db),
+    collection: Session = Depends(get_m_db),
+):
+    plan = db.query(Plan).filter(Plan.id == edit_plan.planId).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+
+    for detail_plan in edit_plan.plans:
+        # plan.visit_spots를 초기화 후 다시 추가
+        plan.visit_spots = []
+        plan.visit_spots.append(
+            {
+                "spot_id": detail_plan.spotId,
+                "date": detail_plan.date,
+            }
+        )
+    db.commit()
+    return JSONResponse(status_code=200, content={"message": "success"})

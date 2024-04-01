@@ -37,6 +37,16 @@ class MySpotResponse(BaseModel):
     locationMemo: Optional[str] = None
 
 
+class IDetailPlan(BaseModel):
+    spotId: int
+    date: str
+
+
+class IEditDetailPlanRequest(BaseModel):
+    planId: int
+    plans: List[IDetailPlan]
+
+
 class ISpot(BaseModel):
     id: str
     name: str
