@@ -39,7 +39,8 @@ async def get_my_spot_list(
         spot_info = collection.find_one({"spot_id": {"$eq": str(my_spot.spot_id)}})
         if spot_info is None:
             continue  # 관광지 정보가 없는 항목은 건너뜀
-
+        if my_spot.like_status is False:
+            continue  # 좋아요를 누르지 않은 항목은 건너뜀
         properties = spot_info.get("properties", {})
         # 이미지, 타이틀, 주소, 메모 필요
         res = MySpotResponseDto(
