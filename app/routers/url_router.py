@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import Any, List
 from starlette import status
 
-from services.url import fetch_og_data, delete_iframe, crawl_naver_blog
+from services.url import crawl_tistory, fetch_og_data, delete_iframe, crawl_naver_blog
 from services.profile import get_internal_id
 from database import get_db, get_m_db, get_es_client
 from models.url import Url
@@ -24,9 +24,7 @@ router = APIRouter(tags=["User Url"], prefix="/url")
 
 
 def get_core_worker():
-    celery = Celery(
-        "core_worker", broker=f"{CELERY_REDIS}/0", backend=f"{CELERY_REDIS}/1"
-    )
+    celery = Celery("core_worker", broker=f"{CELERY_REDIS}/0", backend=f"{CELERY_REDIS}/1")
     celery.conf.task_default_queue = "core_to_ai_queue"
     return celery
 
@@ -206,12 +204,10 @@ async def calculate_url(
             raw_text = crawl_naver_blog(url.url)
         elif re.match(r"https?://m.blog.naver.com/.*", url.url):  # 2. 네이버 모바일
             raw_text = crawl_naver_blog(url.url)
-        elif re.match(
-            r"https?://blog.naver.com/.*", url.url
-        ):  # 3. 네이버 PC (inner iframe)
+        elif re.match(r"https?://blog.naver.com/.*", url.url):  # 3. 네이버 PC (inner iframe)
             raw_text = crawl_naver_blog(delete_iframe(url.url))
-        # elif re.match(r'https?://.*\.tistory.com/.*', url.url):
-        #     crawl_tistory(url.url)
+        elif re.match(r"https?://.*\.tistory.com/.*", url.url):
+            raw_text = crawl_tistory(url.url)
         # elif re.match(r'https?://(www\.)?youtube\.com/.*', url.url) or re.match(r'https?://youtu\.be/.*', url):
         #     crawl_youtube(url.url)
         else:
@@ -263,9 +259,7 @@ def get_calculated_result(
     try:
         knn_response = es.search(index=index_name, body=knn_query)
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Elasticsearch 검색 중 예외가 발생했습니다: {e}"
-        )
+        raise HTTPException(status_code=500, detail=f"Elasticsearch 검색 중 예외가 발생했습니다: {e}")
 
     # 유사한 관광지 저장
     similar_spots = []
