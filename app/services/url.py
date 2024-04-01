@@ -96,6 +96,7 @@ def crawl_tistory(url):
         "User-Agent": 'data-useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
         'like Gecko) Chrome/122.0.0.0 Safari/537.36"'
     }
+
     response = requests.get(url, headers=headers)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
@@ -106,7 +107,9 @@ def crawl_tistory(url):
         .get_text()
     )
     title = title.replace("\n", "")
-    text = soup.find("div", attrs={"id": "article-view"}).get_text()
+    text = (
+        soup.find("div", attrs={"class": "entry-content"}).get_text().replace("\n", " ")
+    )
 
     # 필요없는 데이터들 전처리
     text = (
