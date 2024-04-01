@@ -72,7 +72,7 @@ async def get_trip_list(
     raise HTTPException(status_code=401, detail="Unauthorized user")
 
 
-@router.put("/create")
+@router.post("/")
 async def create_trip(
     profileName: str = Form(...),
     profileImage: UploadFile = Form(...),
@@ -123,6 +123,67 @@ async def create_trip(
         "endDate": plan.end_date,
         "numOfCity": len(plan.cities),
     }
+
+
+@router.put("/")
+async def create_trip(
+    planId: str = Form(...),
+    profileName: str = Form(...),
+    profileImage: UploadFile = Form(...),
+    startDate: str = Form(...),
+    endDate: str = Form(...),
+    cities: str = Form(...),
+    internal_id: str = Depends(get_internal_id),
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.internal_id == internal_id).first()
+    plan = db.query(Plan).filter(Plan.id == planId).first()
+    trip_data = TripCreateForm(
+        profileName=profileName,
+        startDate=startDate.split("T")[0],  # Pydantic이 자동으로 date 객체로 변환
+        endDate=endDate.split("T")[0],  # Pydantic이 자동으로 date 객체로 변환
+        cities=json.loads(cities),
+    )
+
+    plan.creator_id = user.id
+    plan.name = trip_data.profileName
+    plan.start_date = trip_data.startDate
+    plan.end_date = trip_data.endDate
+    plan.cities = trip_data.cities
+    db.commit()
+    db.refresh(plan)
+
+    if profileImage and profileImage.filename:
+        image_data = await profileImage.read()
+        image_stream = BytesIO(image_data)
+        # 이미지 처리
+        processed_image = process_profile_image(image_stream)
+        destination_blob_name = create_plan_secure_path(plan.id, "png")
+
+        # 이미지를 GCP에 업로드하고 사인된 URL을 가져옴
+        public_url = upload_to_open_gcs(processed_image, destination_blob_name)
+        plan.title_image_url = public_url
+
+    db.commit()
+    db.refresh(plan)
+
+    return JSONResponse(status_code=200, content={"message": "success"})
+
+
+@router.delete("/")
+async def create_trip(
+    planId: str,
+    internal_id: str = Depends(get_internal_id),
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.internal_id == internal_id).first()
+    plan = db.query(Plan).filter(Plan.id == planId).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+
+    db.delete(plan)
+    db.commit()
+    return JSONResponse(status_code=200, content={"message": "success"})
 
 
 @router.get("/plan/{plan_id}")
