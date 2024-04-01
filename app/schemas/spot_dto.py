@@ -2,6 +2,15 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 
+class LocationRequestDto(BaseModel):
+    """
+    lat, long 입력받아 사용자 위치 기반 추천 제공
+    """
+
+    lat: float
+    long: float
+
+
 class SpotBaseDto(BaseModel):
     """
     모든 관광지 DTO에서 공통적으로 사용되는 기본 필드

@@ -58,7 +58,7 @@ async def get_my_spot_list(
     return response
 
 
-@router.post("/{spot_id}")
+@router.post("/")
 async def create_my_spot(
     request: MySpotRequestDto,
     internal_id: str = Depends(get_internal_id),
