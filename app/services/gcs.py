@@ -87,6 +87,13 @@ def create_secure_path(user_id, file_extension):
     return f"profiles/{secure_hash}/profile_image/profile_{date_str}{file_extension}"
 
 
+def create_plan_secure_path(user_id, file_extension):
+    date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    # 사용자 ID를 해싱하여 파일 경로에 사용할 고유한 문자열을 생성
+    secure_hash = hashlib.sha256(str(user_id).encode()).hexdigest()
+    return f"plans/{secure_hash}/plans_image/plan_{date_str}{file_extension}"
+
+
 def generate_signed_url(blob_path: str, expiration: int = 600) -> str:
     """GCS의 서명된 url로 임시 접근 권한 제공"""
     blob = bucket.blob(blob_path)

@@ -19,8 +19,8 @@ const dummyData: { data: ITravelDetail } = {
                 },
             },
             days: {
-                "07.12": { id: "1", placeIds: ["1000981", "1917811", "2575406"] },
-                "07.13": { id: "2", placeIds: ["2514027", "2514751"] },
+                "07.12": { placeIds: ["1000981", "1917811", "2575406"] },
+                "07.13": { placeIds: ["2514027", "2514751"] },
             },
             dayOrder: ["07.12", "07.13", "07.14", "07.15"],
         },
@@ -54,6 +54,5 @@ interface IPlace {
 }
 
 interface IDay {
-    id: string;
     placeIds: string[];
 }

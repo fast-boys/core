@@ -13,7 +13,7 @@ from fastapi import (
     UploadFile,
 )
 
-from schemas.profile import UserInfoResponse
+from schemas.profile_dto import UserInfoResponse
 from services.gcs import (
     create_secure_path,
     process_profile_image,
