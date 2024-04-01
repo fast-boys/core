@@ -18,6 +18,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 from pymongo import MongoClient
 
+from models.user_plan import UserPlan
 from services.plan_utils import get_spot_detail
 from models.visit_place import VisitSpot
 from services.gcs import (
@@ -129,7 +130,7 @@ async def create_trip(
 
 
 @router.put("/")
-async def create_trip(
+async def update_plan(
     planId: str = Form(...),
     profileName: str = Form(...),
     profileImage: UploadFile = Form(...),
@@ -174,8 +175,8 @@ async def create_trip(
 
 
 @router.delete("/")
-async def create_trip(
-    planId: str,
+async def delete_plan(
+    planId: int,
     internal_id: str = Depends(get_internal_id),
     db: Session = Depends(get_db),
 ):
@@ -184,8 +185,20 @@ async def create_trip(
     if not plan:
         raise HTTPException(status_code=404, detail="Plan not found")
 
+    # 해당 Plan에 연결된 모든 UserPlan 인스턴스를 찾아서 삭제
+    db.query(UserPlan).filter(UserPlan.plan_id == planId).delete()
+
+    # 해당 Plan에 연결된 모든 VisitSpot 인스턴스를 찾아서 삭제
+    db.query(VisitSpot).filter(VisitSpot.plan_id == planId).delete()
+
     db.delete(plan)
-    db.commit()
+
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()  # 오류가 발생하면 롤백합니다.
+        print(e)
+        raise HTTPException(status_code=500, detail="An error occurred")
     return JSONResponse(status_code=200, content={"message": "success"})
 
 
