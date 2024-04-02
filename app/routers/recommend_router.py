@@ -3,7 +3,7 @@ from typing import Any, List
 import numpy as np
 
 from vault_client import get_env_value
-from schemas.spot_dto import SimpleSpotDto
+from schemas.spot_dto import SimpleSpotDto, LocationRequestDto
 from services.recommend import extract_similar_spots
 from services.profile import get_internal_id
 from database import get_es_client, get_db, get_m_db
@@ -48,6 +48,72 @@ async def get_recommendations(
         },
         "fields": ["name", "spot_id"],
         "size": 11,
+    }
+
+    try:
+        knn_response = es.search(index=index_name, body=knn_query)
+        if not knn_response["hits"]["hits"]:  # 검색 결과가 비어 있는 경우
+            raise HTTPException(status_code=404, detail="검색 결과가 없습니다.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    # 유사한 장소들 추출
+    similar_spots = extract_similar_spots(knn_response, collection)
+
+    # 유사한 관광지가 없는 경우 예외 발생
+    if not similar_spots:
+        raise HTTPException(status_code=404, detail="유사한 관광지를 찾을 수 없습니다.")
+
+    return similar_spots
+
+
+@router.post(path="/location", response_model=List[SimpleSpotDto])
+async def get_recommendations(
+    request: LocationRequestDto,
+    internal_id: str = Depends(get_internal_id),
+    db: Any = Depends(get_db),
+    es: Any = Depends(get_es_client),
+    collection: Any = Depends(get_m_db),
+):
+    """
+    해당 유저의 사용자 벡터를 기반으로 추천 관광지를 10개 반환합니다.
+
+    추가 조건으로 사용자의 위치 기반 10km 이내 관광지를 추천합니다.
+
+    (구미시,36.110336, 128.411238)
+
+    - :param **internal_id**: 사용자 내부 아이디 (HEADER)
+    - :return **List[SimpleSpotDto]**: 유사한 관광지 리스트 반환
+    """
+    # User Info 조회
+    user = db.query(User).filter(User.internal_id == internal_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="해당하는 유저를 찾을 수 없습니다.")
+
+    user_vector = user.vector
+    user_vector = np.frombuffer(user_vector, dtype=float)
+    user_vector = np.nan_to_num(user_vector)
+
+    # user_vector 기준으로 유사도 검색
+    knn_query = {
+        "knn": {
+            "field": "text_vector",
+            "query_vector": user_vector.tolist(),
+            "k": 11,
+            "num_candidates": 100,
+            "filter": {
+                "geo_distance": {
+                    "distance": "10km",  # 10km 이내의 결과만 필터링
+                    "location": {
+                        "lat": request.lat,
+                        "lon": request.long,
+                    },
+                }
+            },
+        },
+        "fields": ["name", "spot_id"],  # 반환할 필드 지정
+        "size": 11,  # 반환할 문서의 최대 개수
     }
 
     try:

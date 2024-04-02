@@ -31,9 +31,17 @@ def fetch_og_data(url):
         else None
     )
 
-    og_image = soup.find("meta", property="og:image")["content"] if soup.find("meta", property="og:image") else None
+    og_image = (
+        soup.find("meta", property="og:image")["content"]
+        if soup.find("meta", property="og:image")
+        else None
+    )
 
-    og_url = soup.find("meta", property="og:url")["content"] if soup.find("meta", property="og:url") else None
+    og_url = (
+        soup.find("meta", property="og:url")["content"]
+        if soup.find("meta", property="og:url")
+        else None
+    )
 
     og_data = {
         "og_title": og_title["content"],
@@ -73,7 +81,12 @@ def crawl_naver_blog(url):
     title = title.replace("\n", "")
     text = soup.find("div", attrs={"class": "se-main-container"}).get_text()
     # 필요없는 데이터들 전처리
-    text = text.replace("\n", "").replace("\u200b", "").replace("Previous image", "").replace("Next image", "")
+    text = (
+        text.replace("\n", "")
+        .replace("\u200b", "")
+        .replace("Previous image", "")
+        .replace("Next image", "")
+    )
 
     return " ".join([title, text])
 
@@ -83,14 +96,27 @@ def crawl_tistory(url):
         "User-Agent": 'data-useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
         'like Gecko) Chrome/122.0.0.0 Safari/537.36"'
     }
+
     response = requests.get(url, headers=headers)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
-    title = soup.find("article", attrs={"id": "content"}).find("div", attrs={"class": "inner"}).find("h1").get_text()
+    title = (
+        soup.find("article", attrs={"id": "content"})
+        .find("div", attrs={"class": "inner"})
+        .find("h1")
+        .get_text()
+    )
     title = title.replace("\n", "")
-    text = soup.find("div", attrs={"id": "article-view"}).get_text()
+    text = (
+        soup.find("div", attrs={"class": "entry-content"}).get_text().replace("\n", " ")
+    )
 
     # 필요없는 데이터들 전처리
-    text = text.replace("\n", "").replace("\u200b", "").replace("Previous image", "").replace("Next image", "")
+    text = (
+        text.replace("\n", "")
+        .replace("\u200b", "")
+        .replace("Previous image", "")
+        .replace("Next image", "")
+    )
 
     return " ".join([title, text])
