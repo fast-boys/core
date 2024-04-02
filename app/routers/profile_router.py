@@ -1,4 +1,5 @@
 from io import BytesIO
+import re
 import uuid
 from fastapi import (
     APIRouter,
@@ -69,15 +70,20 @@ async def update_user_profile(
     background_tasks: BackgroundTasks,
     internal_id: str = Depends(get_internal_id),
     profileName: str = Form(...),
-    profileImg: UploadFile = File(None),
+    profileImg: UploadFile = Form(None),
     db: Session = Depends(get_db),
 ):
     user = db.query(User).filter(User.internal_id == internal_id).first()
+    profileName = profileName.replace(" ", "")
+    if re.match(r"^[a-z0-9_.ㄱ-ㅎ|ㅏ-ㅣ|가-힣]{1,10}$", profileName) is None:
+        raise HTTPException(status_code=400, detail="Invalid nickname")
 
     if not user:
         raise HTTPException(status_code=401, detail="Unauthorized user")
-
     check_duplicate = db.query(User).filter(User.nickname == profileName).first()
+
+    if check_duplicate and user.nickname != check_duplicate.nickname:
+        raise HTTPException(status_code=409, detail="Duplicate nickname")
 
     if not check_duplicate:
         user.nickname = profileName
