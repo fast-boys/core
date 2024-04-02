@@ -5,19 +5,11 @@ from sqlalchemy import (
     DateTime,
     func,
     Boolean,
-    Enum,
     LargeBinary,
     ForeignKey,
 )
 from sqlalchemy.orm import relationship
 from database import Base
-import enum
-
-
-class StatusEnum(enum.Enum):
-    NONE = "None"
-    FALSE = "False"
-    TRUE = "True"
 
 
 class Url(Base):
@@ -30,7 +22,7 @@ class Url(Base):
     title = Column(String(255), nullable=True)
     image = Column(String(2048), nullable=True)
     description = Column(String(255), nullable=True)
-    status = Column(Enum(StatusEnum), nullable=False, default=StatusEnum.NONE)
+    status = Column(String(6), nullable=False, default="None")
     vector = Column(LargeBinary, nullable=True)
 
     user = relationship("User", back_populates="urls")
