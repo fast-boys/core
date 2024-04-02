@@ -233,9 +233,10 @@ async def get_plan_detail(
         dayorder.add(str(date))
 
         if visited_spot.date not in days:
-            days[visited_spot.date] = []
+            days[visited_spot.date] = [str(visited_spot.spot_id)]
         else:
-            days[visited_spot.date].append("spot_id")
+            days[visited_spot.date].append(str(visited_spot.spot_id))
+        print(days)
 
     iplan = IPlan(
         places=places,
