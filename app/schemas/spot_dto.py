@@ -57,7 +57,7 @@ class MySpotRequestDto(BaseModel):
     """
 
     spot_id: str
-    memo: str
+    memo: Optional[str] = None
 
 
 class DetailSpotDto(SpotBaseDto):
