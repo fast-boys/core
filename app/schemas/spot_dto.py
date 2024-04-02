@@ -1,3 +1,4 @@
+import datetime
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -26,6 +27,20 @@ class SimpleSpotDto(SpotBaseDto):
     """
     자동완성 및 간단한 정보제공을 위한 DTO
     """
+
+
+class MyMemoResponseDto(BaseModel):
+    """
+    Memo list DTO
+    """
+
+    spot_id: int
+    memo: Optional[str] = None
+    like_status: bool
+    created_date: datetime.date
+
+    class Config:
+        from_attributes = True
 
 
 class MySpotResponseDto(SpotBaseDto):
