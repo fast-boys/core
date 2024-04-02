@@ -4,4 +4,4 @@ from pydantic import BaseModel
 
 class UserInfoResponse(BaseModel):
     username: str
-    profileImage: str
+    profileImage: Optional[str]

@@ -1,3 +1,4 @@
+import datetime
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -28,6 +29,20 @@ class SimpleSpotDto(SpotBaseDto):
     """
 
 
+class MyMemoResponseDto(BaseModel):
+    """
+    Memo list DTO
+    """
+
+    spot_id: int
+    memo: Optional[str] = None
+    like_status: bool
+    created_date: datetime.date
+
+    class Config:
+        from_attributes = True
+
+
 class MySpotResponseDto(SpotBaseDto):
     """
     내 여행지 페이지에 띄워줄 response dto
@@ -42,7 +57,7 @@ class MySpotRequestDto(BaseModel):
     """
 
     spot_id: str
-    memo: str
+    memo: Optional[str] = None
 
 
 class DetailSpotDto(SpotBaseDto):
