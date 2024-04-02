@@ -37,7 +37,7 @@ class MyMemoResponseDto(BaseModel):
     spot_id: int
     memo: Optional[str] = None
     like_status: bool
-    created_date: datetime.date
+    created_date: datetime.datetime
 
     class Config:
         from_attributes = True

@@ -1,6 +1,7 @@
-from sqlalchemy import Boolean, Column, BigInteger, String, ForeignKey
+from sqlalchemy import Boolean, Column, BigInteger, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from database import Base
+from datetime import datetime
 
 
 class MySpot(Base):
@@ -11,6 +12,6 @@ class MySpot(Base):
     spot_id = Column(BigInteger, nullable=False)
     memo = Column(String(255), nullable=True)
     like_status = Column(Boolean, nullable=False, default=False)
-    created_date = Column(String(255), nullable=True)
+    created_date = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="my_spots")
