@@ -81,7 +81,8 @@ async def create_my_spot(
     if existing_spot:
         existing_spot.like_status = True
         existing_spot.memo = request.memo
-        return {"message": "좋아요 완료", "spot_id": new_spot.spot_id}
+        db.commit()
+        return {"message": "좋아요 완료", "spot_id": existing_spot.spot_id}
 
     # if existing_spot and existing_spot.like_status is True:
     #     return {"message": "이미 추가된 관광지 입니다.", "spot_id": existing_spot.spot_id}
@@ -127,7 +128,7 @@ async def delete_my_spot(
     return {"message": "삭제 완료."}
 
 
-@router.put("/memo/{spot_id}")
+@router.put("/memo")
 async def edit_memo(
     spot_id: str,
     memo: str,
