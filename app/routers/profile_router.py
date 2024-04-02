@@ -42,7 +42,9 @@ async def get_user_profile(
 
     user_data = UserInfoResponse(
         username=user.nickname,
-        profileImage=None if user.profile_image == "profiles/defaultProfile.svg" else user.profile_image,
+        profileImage=None
+        if user.profile_image == "profiles/defaultProfile.svg"
+        else user.profile_image,
     )
     return user_data
 
