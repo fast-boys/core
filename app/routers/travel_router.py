@@ -222,7 +222,7 @@ async def get_plan_detail(
         # 지역 정보 탐색
         tour_spot = await get_spot_detail(spot_id, collection)
         spot = ISpot(
-            id=tour_spot.spot_id,
+            id=str(tour_spot.spot_id),
             name=tour_spot.name,
             category=tour_spot.category,
             lat=tour_spot.lat,

@@ -50,7 +50,7 @@ class IEditDetailPlanRequest(BaseModel):
 
 
 class ISpot(BaseModel):
-    id: int
+    id: str
     name: str
     category: List[int]
     lat: str
