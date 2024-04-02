@@ -121,7 +121,7 @@ async def delete_my_spot(
         raise HTTPException(status_code=404, detail="해당하는 id의 my_spot 정보를 찾을 수 없습니다.")
 
     my_spot.like_status = False
-    if my_spot.like_status is False and my_spot.memo is None:
+    if my_spot.like_status is False and (my_spot.memo is None or my_spot.memo == ""):
         db.delete(my_spot)
     db.commit()
 
@@ -196,7 +196,7 @@ async def delete_my_spot(
         raise HTTPException(status_code=404, detail="해당하는 id의 my_spot 정보를 찾을 수 없습니다.")
 
     my_spot.memo = None
-    if my_spot.like_status is False and (my_spot.memo is None or my_spot.memo == ""):
+    if my_spot.like_status is False and (my_spot.memo is None):
         db.delete(my_spot)
     db.commit()
 
