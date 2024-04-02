@@ -68,6 +68,7 @@ async def get_trip_list(
                 planName=plan.name,
                 startDate=plan.start_date,
                 endDate=plan.end_date,
+                cities=plan.cities,
                 numOfCity=len(plan.cities),
             )
             response.append(res)
@@ -125,6 +126,7 @@ async def create_trip(
         "planName": plan.name,
         "startDate": plan.start_date,
         "endDate": plan.end_date,
+        "cities": plan.cities,
         "numOfCity": len(plan.cities),
     }
 
