@@ -47,7 +47,7 @@ async def get_random_spot(
         {
             "$match": {
                 "category": category,  # 카테고리에 맞는 문서를 필터링
-                "depiction": {"$exists": True, "$ne": []},
+                "our_image_url": {"$exists": True, "$ne": ""},
             }
         },
         {"$sample": {"size": count}},  # 5개 랜덤 추출
@@ -60,7 +60,7 @@ async def get_random_spot(
             spot_id=doc.get("spot_id"),
             name=doc.get("name"),
             address=doc.get("address", ""),
-            image_url=doc.get("depiction")[0],
+            image_url=doc.get("our_image_url"),
         )
         spots.append(spot)
 
