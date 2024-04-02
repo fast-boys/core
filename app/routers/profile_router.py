@@ -68,8 +68,8 @@ async def check_nickname_duplicate(
 async def update_user_profile(
     background_tasks: BackgroundTasks,
     internal_id: str = Depends(get_internal_id),
-    name: str = Form(...),
-    profile_img: UploadFile = File(None),
+    profileName: str = Form(...),
+    profileImg: UploadFile = File(None),
     db: Session = Depends(get_db),
 ):
     user = db.query(User).filter(User.internal_id == internal_id).first()
@@ -77,16 +77,16 @@ async def update_user_profile(
     if not user:
         raise HTTPException(status_code=401, detail="Unauthorized user")
 
-    check_duplicate = db.query(User).filter(User.nickname == name).first()
+    check_duplicate = db.query(User).filter(User.nickname == profileName).first()
 
     if not check_duplicate:
-        user.nickname = name
+        user.nickname = profileName
 
     if user == check_duplicate:
         check_duplicate = None
 
-    if profile_img and profile_img.filename:
-        image_data = await profile_img.read()
+    if profileImg and profileImg.filename:
+        image_data = await profileImg.read()
         image_stream = BytesIO(image_data)
         # 이미지 처리
         processed_image = process_profile_image(image_stream)
