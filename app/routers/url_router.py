@@ -11,7 +11,7 @@ from starlette import status
 from services.url import crawl_tistory, fetch_og_data, delete_iframe, crawl_naver_blog
 from services.profile import get_internal_id
 from database import get_db, get_m_db, get_es_client
-from models.url import Url, StatusEnum
+from models.url import Url
 from models.user import User
 from schemas.url_dto import UrlDto
 from schemas.spot_dto import SimpleSpotDto
@@ -63,7 +63,7 @@ async def save_url(
         title=resource["og_title"],
         image=resource["og_image"],
         description=resource["og_description"],
-        status=False,  # 기본값 사용
+        # status=StatusEnum.NONE.value,  # 기본값 사용
         created_at=datetime.utcnow(),
     )
 
@@ -216,7 +216,8 @@ async def calculate_url(
         #     crawl_youtube(url.url)
         else:
             # 지원되지 않는 url인 경우, 해당 url의 status 변경
-            url.status = StatusEnum.FALSE
+            url.status = "False"
+            db.commit()
             raise HTTPException(status_code=400, detail="지원되지 않는 URL 형식입니다.")
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=400, detail=f"URL 처리 중 에러가 발생했습니다: {e}")
@@ -243,7 +244,7 @@ def get_calculated_result(
     # Url 조회
     url = db.query(Url).filter(Url.id == url_id).first()
 
-    if not url.status:
+    if url.status == "None":
         raise HTTPException(status_code=400, detail="해당 URL에 대한 추천 벡터가 생성되지 않았습니다.")
 
     url_vector = url.vector
