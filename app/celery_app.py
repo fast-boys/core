@@ -6,7 +6,7 @@ import numpy as np
 
 from database import get_db
 from models import user, plan, user_plan, visit_place, city, article, my_spot, url
-from models.url import Url, StatusEnum
+from models.url import Url
 
 load_dotenv()
 vault_token = os.getenv("VAULT_TOKEN")
@@ -46,7 +46,7 @@ def process_data(data: dict):
         if url_to_update is None:
             raise ValueError("url_id 정보가 없습니다.")
 
-        url_to_update.status = StatusEnum.TRUE
+        url_to_update.status = "True"
         vector = np.array(vector, dtype=float)
         url_to_update.vector = vector.tobytes()
         db.commit()  # 변경 사항을 DB에 커밋
