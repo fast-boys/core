@@ -19,6 +19,7 @@ class TravelResponse(BaseModel):
     planName: str
     startDate: datetime.date
     endDate: datetime.date
+    cities: Optional[List[int]] = None
     numOfCity: int
 
 
