@@ -220,6 +220,8 @@ async def calculate_url(
             db.commit()
             raise HTTPException(status_code=400, detail="지원되지 않는 URL 형식입니다.")
     except requests.exceptions.RequestException as e:
+        url.status = "False"
+        db.commit()
         raise HTTPException(status_code=400, detail=f"URL 처리 중 에러가 발생했습니다: {e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"크롤링 중 예상치 못한 에러가 발생했습니다: {e}")
