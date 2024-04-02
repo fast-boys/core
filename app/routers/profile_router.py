@@ -42,9 +42,7 @@ async def get_user_profile(
 
     user_data = UserInfoResponse(
         username=user.nickname,
-        profileImage=None
-        if user.profile_image == "profiles/defaultProfile.svg"
-        else user.profile_image,
+        profileImage=None if user.profile_image == "profiles/defaultProfile.svg" else user.profile_image,
     )
     return user_data
 
@@ -72,7 +70,7 @@ async def update_user_profile(
     background_tasks: BackgroundTasks,
     internal_id: str = Depends(get_internal_id),
     profileName: str = Form(...),
-    profileImg: UploadFile = Form(None),
+    profileImage: UploadFile = Form(None),
     db: Session = Depends(get_db),
 ):
     user = db.query(User).filter(User.internal_id == internal_id).first()
@@ -83,7 +81,6 @@ async def update_user_profile(
     if not user:
         raise HTTPException(status_code=401, detail="Unauthorized user")
     check_duplicate = db.query(User).filter(User.nickname == profileName).first()
-
     if check_duplicate and user.nickname != check_duplicate.nickname:
         raise HTTPException(status_code=409, detail="Duplicate nickname")
 
@@ -93,8 +90,8 @@ async def update_user_profile(
     if user == check_duplicate:
         check_duplicate = None
 
-    if profileImg and profileImg.filename:
-        image_data = await profileImg.read()
+    if profileImage and profileImage.filename:
+        image_data = await profileImage.read()
         image_stream = BytesIO(image_data)
         # 이미지 처리
         processed_image = process_profile_image(image_stream)
