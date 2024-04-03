@@ -147,8 +147,8 @@ async def update_plan(
     plan = db.query(Plan).filter(Plan.id == planId).first()
     trip_data = TripCreateForm(
         profileName=profileName,
-        startDate=startDate.split(" ")[0],  # Pydantic이 자동으로 date 객체로 변환
-        endDate=endDate.split(" ")[0],  # Pydantic이 자동으로 date 객체로 변환
+        startDate=startDate.split("T")[0],  # Pydantic이 자동으로 date 객체로 변환
+        endDate=endDate.split("T")[0],  # Pydantic이 자동으로 date 객체로 변환
         cities=json.loads(cities),
     )
 
