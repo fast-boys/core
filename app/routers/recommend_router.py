@@ -16,10 +16,10 @@ index_name = get_env_value("ES_IDX_NAME")
 
 @router.get(path="/", response_model=List[SimpleSpotDto])
 async def get_recommendations(
-    internal_id: str = Depends(get_internal_id),
-    db: Any = Depends(get_db),
-    es: Any = Depends(get_es_client),
-    collection: Any = Depends(get_m_db),
+        internal_id: str = Depends(get_internal_id),
+        db: Any = Depends(get_db),
+        es: Any = Depends(get_es_client),
+        collection: Any = Depends(get_m_db),
 ):
     """
     해당 유저의 사용자 벡터를 기반으로 추천 관광지를 10개 반환합니다.
@@ -69,11 +69,11 @@ async def get_recommendations(
 
 @router.post(path="/location", response_model=List[SimpleSpotDto])
 async def get_recommendations(
-    request: LocationRequestDto,
-    internal_id: str = Depends(get_internal_id),
-    db: Any = Depends(get_db),
-    es: Any = Depends(get_es_client),
-    collection: Any = Depends(get_m_db),
+        request: LocationRequestDto,
+        internal_id: str = Depends(get_internal_id),
+        db: Any = Depends(get_db),
+        es: Any = Depends(get_es_client),
+        collection: Any = Depends(get_m_db),
 ):
     """
     해당 유저의 사용자 벡터를 기반으로 추천 관광지를 10개 반환합니다.
@@ -135,9 +135,9 @@ async def get_recommendations(
 
 @router.get(path="/{spot_id}/global", response_model=List[SimpleSpotDto])
 async def get_similar_by_spot_id_in_global(
-    spot_id: str,
-    es: Any = Depends(get_es_client),
-    collection: Any = Depends(get_m_db),
+        spot_id: str,
+        es: Any = Depends(get_es_client),
+        collection: Any = Depends(get_m_db),
 ):
     """
     관광지의 Id를 받아 유사한 관광지를 10개 반환합니다.
@@ -188,9 +188,9 @@ async def get_similar_by_spot_id_in_global(
 
 @router.get(path="/{spot_id}/local", response_model=List[SimpleSpotDto])
 async def get_similar_by_spot_id_in_local(
-    spot_id: str,
-    es: Any = Depends(get_es_client),
-    collection: Any = Depends(get_m_db),
+        spot_id: str,
+        es: Any = Depends(get_es_client),
+        collection: Any = Depends(get_m_db),
 ):
     """
     관광지의 Id를 받아 유사한 관광지를 10개 반환합니다.
@@ -250,4 +250,51 @@ async def get_similar_by_spot_id_in_local(
     if not similar_spots:
         raise HTTPException(status_code=404, detail="유사한 관광지를 찾을 수 없습니다.")
 
+    return similar_spots
+
+
+@router.get(path="/best_list", response_model=List[SimpleSpotDto])
+async def get_best_list(
+        db: Any = Depends(get_db),
+        es: Any = Depends(get_es_client),
+        collection: Any = Depends(get_m_db),
+):
+    """
+    실시간 인기 여행지를 보여줍니다 (더미데이터)
+
+    - :param **internal_id**: 사용자 내부 아이디 (HEADER)
+    - :return **List[SimpleSpotDto]**: 유사한 관광지 리스트 반환
+    """
+
+    # 미구현, 일단 랜덤으로 관광지 리턴
+    rand_query = {
+        "query": {
+            "terms": {
+                "spot_id": [
+                    "1032715",
+                    "1008185",
+                    "1022231",
+                    "1051766",
+                    "1013441",
+                    "1013527",
+                    "1002006",
+                    "1034361",
+                    "125583",
+                    "126230"
+                ]
+            }
+        },
+        "size": 10,
+        "_source": ["name", "spot_id"]
+    }
+
+    try:
+        response = es.search(index=index_name, body=rand_query)
+        if not response["hits"]["hits"]:  # 검색 결과가 비어 있는 경우
+            raise HTTPException(status_code=404, detail="검색 결과가 없습니다.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    # 유사한 장소들 추출
+    similar_spots = extract_similar_spots(response, collection)
     return similar_spots
