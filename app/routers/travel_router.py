@@ -305,7 +305,7 @@ async def add_spot_to_plan(
         creator_id=plan.creator_id,
         plan_id=plan.id,
         spot_id=request.spotId,
-        date=datetime.strptime(request.date, "%Y-%m-%d").date(),
+        date=request.date.split("T")[0],
     )
     db.add(visit_spot)
     db.commit()
