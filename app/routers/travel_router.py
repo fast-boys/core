@@ -30,6 +30,7 @@ from services.gcs import (
 from routers.spot_router import get_details
 from models.plan import Plan
 from schemas.travel_dto import (
+    AddSpotToPlanRequest,
     IEditDetailPlanRequest,
     IPlan,
     ISpot,
@@ -286,5 +287,26 @@ async def get_plan_detail(
             date=datetime.strptime(detail_plan.date, "%Y-%m-%d").date(),
         )
         db.add(visit_spot)
+    db.commit()
+    return JSONResponse(status_code=200, content={"message": "success"})
+
+
+@router.post("/add-spot-to-plan")
+async def add_spot_to_plan(
+    request: AddSpotToPlanRequest,
+    internal_id: str = Depends(get_internal_id),
+    db: Session = Depends(get_db),
+):
+    plan = db.query(Plan).filter(Plan.id == request.planId).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    # plan.visit_spots를 초기화 후 다시 추가
+    visit_spot = VisitSpot(
+        creator_id=plan.creator_id,
+        plan_id=plan.id,
+        spot_id=request.spotId,
+        date=request.date.split("T")[0],
+    )
+    db.add(visit_spot)
     db.commit()
     return JSONResponse(status_code=200, content={"message": "success"})

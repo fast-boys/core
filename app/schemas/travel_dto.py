@@ -40,6 +40,12 @@ class MySpotResponse(BaseModel):
     locationMemo: Optional[str] = None
 
 
+class AddSpotToPlanRequest(BaseModel):
+    spotId: str
+    planId: int
+    date: str
+
+
 class IDetailPlan(BaseModel):
     spotId: str
     date: str
