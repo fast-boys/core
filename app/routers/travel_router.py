@@ -291,7 +291,7 @@ async def get_plan_detail(
     return JSONResponse(status_code=200, content={"message": "success"})
 
 
-@router.post("/plan/{plan_id}/{spot_id}")
+@router.post("/add-spot-to-plan")
 async def add_spot_to_plan(
     request: AddSpotToPlanRequest,
     internal_id: str = Depends(get_internal_id),
